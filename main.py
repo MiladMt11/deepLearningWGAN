@@ -1,16 +1,18 @@
 from torch.autograd import Variable
-import os
-import matplotlib.pyplot as plt
-from IPython.display import Image, display, clear_output
-from Data_loader import train_loader, test_loader
+from Dataset.CIFAR_dataloader import train_loader, test_loader
 import torch
-from GAN_Model import Generator, Discriminator
+from Models.DCGAN import Generator, Discriminator
 import numpy as np
+import matplotlib.image
+from torch.utils.tensorboard import SummaryWriter
+from torchvision import utils
+
+writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 latent_dim = 100
-discriminator = Discriminator().to(device)
-generator = Generator(latent_dim).to(device)
+discriminator = Discriminator(3).to(device)
+generator = Generator(latent_dim, 3).to(device)
 
 loss = torch.nn.BCELoss()
 print("Using device:", device)
@@ -20,10 +22,10 @@ discriminator_optim = torch.optim.Adam(discriminator.parameters(), 2e-4, betas=(
 tmp_img = "tmp_gan_out.png"
 discriminator_loss, generator_loss = [], []
 
-num_epochs = 50
+num_epochs = 1000
 for epoch in range(num_epochs):
     batch_d_loss, batch_g_loss = [], []
-
+    generator.train()
     for x, _ in train_loader:
         batch_size = x.size(0)
         # True data is given label 1, while fake data is given label 0
@@ -71,42 +73,19 @@ for epoch in range(num_epochs):
 
     discriminator_loss.append(np.mean(batch_d_loss))
     generator_loss.append(np.mean(batch_g_loss))
+    writer.add_scalar('Discreminator Loss true/train', error_true, epoch)
+    writer.add_scalar('Discreminator Loss fake/train', error_fake, epoch)
+    writer.add_scalar('Generator Loss/train', np.mean(batch_g_loss), epoch)
 
-    # -- Plotting --
-    f, axarr = plt.subplots(1, 2, figsize=(18, 7))
-
-    # Loss
-    ax = axarr[0]
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Loss')
-
-    ax.plot(np.arange(epoch + 1), discriminator_loss)
-    ax.plot(np.arange(epoch + 1), generator_loss, linestyle="--")
-    ax.legend(['Discriminator', 'Generator'])
-
-    # Latent space samples
-    ax = axarr[1]
-    ax.set_title('Samples from generator')
-    ax.axis('off')
-
-    rows, columns = 7, 7
-
-    # Generate data
-    with torch.no_grad():
-        z = torch.randn(batch_size, 1, latent_dim)
-        z = Variable(z, requires_grad=False).to(device)
-        x_fake = generator(z)
-
-    canvas = np.zeros((28 * rows, columns * 28))
-    for i in range(rows):
-        for j in range(columns):
-            idx = i % columns + rows * j
-            canvas[i * 28:(i + 1) * 28, j * 28:(j + 1) * 28] = x_fake.cpu().data[idx]
-    ax.imshow(canvas, cmap='gray')
-
-    plt.savefig(tmp_img)
-    plt.close(f)
-    display(Image(filename=tmp_img))
-    clear_output(wait=True)
-
-    os.remove(tmp_img)
+    # writer.add_image("test", matplotlib.image.imread('Results/img_generatori_iter_{}.png'.format(epoch)), 2, dataformats='HWC')
+    if epoch % 100 == 0:
+        z = torch.randn(1, 100, 1, 1).to(device)
+        generator.eval()
+        fake_image = generator(z)
+        samples = fake_image.mul(0.5).add(0.5)
+        samples = samples.data.cpu()
+        grid = utils.make_grid(samples)
+        utils.save_image(grid, 'Results/img_generatori_iter_{}.png'.format(epoch))
+        torch.save(generator.state_dict(), "checkpoint/G.pth")
+        torch.save(discriminator.state_dict(), "checkpoint/D.pth")
+        print('model saved!')
