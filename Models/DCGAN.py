@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
+from Dataset.CIFAR_dataloader import train_loader
+import os
 
 writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -10,6 +12,15 @@ class Flatten(nn.Module):
         return x.view(x.size(0), -1)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+# custom weights initialization called on netG and netD
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
 
 class Generator(nn.Module):
     def __init__(self, num_input, num_output):
@@ -39,7 +50,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         def Conv(input_nums, output_nums):
             layer = []
-            layer.append(nn.Conv2d(input_nums, output_nums, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)))
+            layer.append(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)))
             layer.append(nn.BatchNorm2d(output_nums))
             layer.append(nn.LeakyReLU(0.2))
             return layer
@@ -48,23 +59,81 @@ class Discriminator(nn.Module):
             *Conv(input_nums, 64),
             *Conv(64, 256),
             *Conv(256, 512),
+            nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(2, 2), padding=(0, 0)),
+            nn.Sigmoid()
         )
-        self.Flatten = nn.Flatten()
-        self.dense = nn.Linear(512 * 4 * 4, 1)
-        self.activation = nn.Sigmoid()
 
     def forward(self, input):
         output = self.Net(input)
-        output = self.Flatten(output)
-        output = self.dense(output)
-        output = self.activation(output)
+        output = torch.squeeze(output, dim=-1)
+        output = torch.squeeze(output, dim=-1)
         return output
 
+class DCGAN():
+    def __init__(self):
+        self.G = Generator(100, 3).to(device)
+        self.D = Discriminator(3).to(device)
+        self.epochs = int(1e3)
+        self.loss_func = nn.BCELoss()
+
+    def train(self, train_loader):
+        try:
+            os.mkdir('../checkpoint/DCGAN/')
+        except:
+            pass
+        optim_G = torch.optim.RMSprop(self.G.parameters(), lr=5e-5)
+        optim_D = torch.optim.RMSprop(self.D.parameters(), lr=5e-5)
+        try:
+            self.load()
+        except:
+            pass
+        for epoch in range(self.epochs):
+            for x, _ in train_loader:
+                x = x.to(device)
+                batch_size = x.size(0)
+                true_label = torch.ones(batch_size, 1).to(device)
+                fake_label = torch.zeros(batch_size, 1).to(device)
+                self.D.zero_grad()
+                self.G.zero_grad()
+                D_real = self.D(x)
+                loss_real = self.loss_func(D_real, true_label)
+                z = torch.randn((batch_size, 100, 1, 1)).to(device)
+                x_fake = self.G(z)
+                D_fake = self.D(x_fake.detach())
+                loss_fake = self.loss_func(D_fake, fake_label)
+                loss_D = loss_fake + loss_real
+                # train the discreiminator
+                optim_D.zero_grad()
+                loss_D.backward()
+                optim_D.step()
+                x_fake = self.G(z)
+                loss_G = self.D(x_fake)
+                loss_G = self.loss_func(loss_G, true_label)
+                # train the generator
+                optim_G.zero_grad()
+                loss_G.backward()
+                optim_G.step()
+            if epoch % 20 == 0:
+                self.save()
+
+    def save(self):
+        torch.save(self.G.state_dict(), "../checkpoint/DCGAN/G.pth")
+        torch.save(self.D.state_dict(), "../checkpoint/DCGAN/D.pth")
+        print("model saved!")
+
+    def load(self):
+        self.G = torch.load("../checkpoint/DCGAN/G.pth")
+        self.D = torch.load("../checkpoint/DCGAN/D.pth")
+        print("load")
+
+
 if __name__ == '__main__':
-    z = torch.randn((1, 100, 1, 1)).to(device)
-    G = Generator(100, 3).to(device)
-    output = G(z)
-    fake_image = torch.squeeze(output, dim=0)
-    fake_image = fake_image.view(32, 32, 3)
-    fake_image = fake_image.cpu().detach().numpy()
-    writer.add_image("test", fake_image,2,dataformats='HWC')
+    # z = torch.randn((1, 100, 1, 1)).to(device)
+    # G = Generator(100, 3).to(device)
+    # output = G(z)
+    # D = Discriminator(3).to(device)
+    # D.apply(weights_init)
+    # output = D(output)
+    # print(output.shape)
+    DCGAN = DCGAN()
+    DCGAN.train(train_loader)
