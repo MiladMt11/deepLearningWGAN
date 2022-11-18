@@ -4,6 +4,13 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 from Dataset.CIFAR_dataloader import train_loader
 import os
+import wandb
+wandb.init(project="DCGAN-project", entity="projekt17")
+wandb.config = {
+  "learning_rate": 1e-4,
+  "epochs": int(1e3),
+  "batch_size": 64
+}
 
 writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -81,8 +88,8 @@ class DCGAN():
             os.mkdir('../checkpoint/DCGAN/')
         except:
             pass
-        optim_G = torch.optim.RMSprop(self.G.parameters(), lr=5e-5)
-        optim_D = torch.optim.RMSprop(self.D.parameters(), lr=5e-5)
+        optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4)
+        optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4)
         try:
             self.load()
         except:
@@ -102,6 +109,7 @@ class DCGAN():
                 D_fake = self.D(x_fake.detach())
                 loss_fake = self.loss_func(D_fake, fake_label)
                 loss_D = loss_fake + loss_real
+                wandb.log({"loss_D": loss_D})
                 # train the discreiminator
                 optim_D.zero_grad()
                 loss_D.backward()
@@ -109,6 +117,7 @@ class DCGAN():
                 x_fake = self.G(z)
                 loss_G = self.D(x_fake)
                 loss_G = self.loss_func(loss_G, true_label)
+                wandb.log({"loss_G": loss_G})
                 # train the generator
                 optim_G.zero_grad()
                 loss_G.backward()
@@ -122,8 +131,8 @@ class DCGAN():
         print("model saved!")
 
     def load(self):
-        self.G = torch.load("../checkpoint/DCGAN/G.pth")
-        self.D = torch.load("../checkpoint/DCGAN/D.pth")
+        self.G.load_state_dict(torch.load("../checkpoint/DCGAN/G.pth"))
+        self.D.load_state_dict(torch.load("../checkpoint/DCGAN/D.pth"))
         print("load")
 
 

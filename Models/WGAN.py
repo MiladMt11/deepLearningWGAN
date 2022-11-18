@@ -95,8 +95,8 @@ class WGAN():
         print("model saved!")
 
     def load(self):
-        self.G = torch.load("../checkpoint/WGAN/G.pth")
-        self.D = torch.load("../checkpoint/WGAN/D.pth")
+        self.G.load_state_dict(torch.load("../checkpoint/WGAN/G.pth"))
+        self.D.load_state_dict(torch.load("../checkpoint/WGAN/D.pth"))
         print("load")
 
 if __name__ == '__main__':
