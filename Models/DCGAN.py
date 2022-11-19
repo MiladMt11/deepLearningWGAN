@@ -5,6 +5,8 @@ from torch.utils.tensorboard import SummaryWriter
 from Dataset.CIFAR_dataloader import train_loader
 import os
 import wandb
+from torchvision import utils
+
 wandb.init(project="DCGAN-project", entity="projekt17")
 wandb.config = {
   "learning_rate": 1e-4,
@@ -122,8 +124,12 @@ class DCGAN():
                 optim_G.zero_grad()
                 loss_G.backward()
                 optim_G.step()
+            print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
+            print("D_real_loss:{}, D_fake_loss:{}".format(loss_real.cpu().detach().numpy(),
+                                                                   loss_fake.cpu().detach().numpy()))
             if epoch % 20 == 0:
                 self.save()
+                self.evaluate(epoch = epoch)
 
     def save(self):
         torch.save(self.G.state_dict(), "../checkpoint/DCGAN/G.pth")
@@ -133,16 +139,22 @@ class DCGAN():
     def load(self):
         self.G.load_state_dict(torch.load("../checkpoint/DCGAN/G.pth"))
         self.D.load_state_dict(torch.load("../checkpoint/DCGAN/D.pth"))
-        print("load")
+        print("model loaded!")
 
+    def evaluate(self, epoch = 0):
+        self.load()
+        z = torch.randn((1, 100, 1, 1)).to(device)
+        with torch.no_grad():
+            fake_img = self.G(z)
+            fake_img = fake_img.data.cpu()
+            grid = utils.make_grid(fake_img)
+            utils.save_image(grid, '../Results/DCGAN_CIFAR/img_generatori_iter_{}.png'.format(epoch))
 
 if __name__ == '__main__':
-    # z = torch.randn((1, 100, 1, 1)).to(device)
-    # G = Generator(100, 3).to(device)
-    # output = G(z)
-    # D = Discriminator(3).to(device)
-    # D.apply(weights_init)
-    # output = D(output)
-    # print(output.shape)
     DCGAN = DCGAN()
+    try:
+        os.mkdir('../Results/DCGAN_CIFAR/')
+    except:
+        pass
     DCGAN.train(train_loader)
+    # DCGAN.evaluate()
