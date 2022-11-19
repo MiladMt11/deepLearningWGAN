@@ -27,7 +27,7 @@ def stratified_sampler(labels):
     indices = torch.from_numpy(indices)
     return SubsetRandomSampler(indices)
 
-batch_size = 64
+batch_size = 1024
 # The loaders perform the actual work
 train_loader = DataLoader(dset_train, batch_size=batch_size,
                           sampler=stratified_sampler(dset_train.targets), pin_memory=cuda)

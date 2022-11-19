@@ -1,3 +1,5 @@
+import sys
+sys.path.append('h:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN')
 import torch
 import torch.nn as nn
 import os

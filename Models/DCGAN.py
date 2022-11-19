@@ -1,3 +1,5 @@
+import sys
+sys.path.append('h:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN')
 import torch
 import torch.nn as nn
 import numpy as np
@@ -95,7 +97,8 @@ class DCGAN():
         try:
             self.load()
         except:
-            pass
+            self.D.apply(weights_init)
+            print('parameters initialization')
         for epoch in range(self.epochs):
             for x, _ in train_loader:
                 x = x.to(device)
