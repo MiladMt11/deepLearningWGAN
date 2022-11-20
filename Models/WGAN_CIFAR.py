@@ -114,15 +114,15 @@ class WGAN():
                 self.evaluate(epoch)
 
     def save(self, epoch):
-        torch.save(self.G.state_dict(), "../checkpoint/WGAN/G.pth")
-        torch.save(self.D.state_dict(), "../checkpoint/WGAN/D.pth")
-        torch.save(self.G.state_dict(), "../checkpoint/WGAN/G_{}.pth".format(epoch))
-        torch.save(self.D.state_dict(), "../checkpoint/WGAN/D_{}.pth".format(epoch))
+        torch.save(self.G.state_dict(), "../checkpoint/WGAN_CIFAR/G.pth")
+        torch.save(self.D.state_dict(), "../checkpoint/WGAN_CIFAR/D.pth")
+        torch.save(self.G.state_dict(), "../checkpoint/WGAN_CIFAR/G_{}.pth".format(epoch))
+        torch.save(self.D.state_dict(), "../checkpoint/WGAN_CIFAR/D_{}.pth".format(epoch))
         print("model saved!")
 
     def load(self):
-        self.G.load_state_dict(torch.load("../checkpoint/WGAN/G.pth"))
-        self.D.load_state_dict(torch.load("../checkpoint/WGAN/D.pth"))
+        self.G.load_state_dict(torch.load("../checkpoint/WGAN_CIFAR/G.pth"))
+        self.D.load_state_dict(torch.load("../checkpoint/WGAN_CIFAR/D.pth"))
         print("model loaded!")
 
     def evaluate(self, epoch = 0):

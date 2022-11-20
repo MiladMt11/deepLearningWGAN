@@ -117,15 +117,15 @@ class WGAN():
                 self.evaluate(epoch)
 
     def save(self, epoch):
-        torch.save(self.G.state_dict(), "../checkpoint/WGAN/G.pth")
-        torch.save(self.D.state_dict(), "../checkpoint/WGAN/D.pth")
-        torch.save(self.G.state_dict(), "../checkpoint/WGAN/G_{}.pth".format(epoch))
-        torch.save(self.D.state_dict(), "../checkpoint/WGAN/D_{}.pth".format(epoch))
+        torch.save(self.G.state_dict(), "../checkpoint/WGAN_MNIST/G.pth")
+        torch.save(self.D.state_dict(), "../checkpoint/WGAN_MNIST/D.pth")
+        torch.save(self.G.state_dict(), "../checkpoint/WGAN_MNIST/G_{}.pth".format(epoch))
+        torch.save(self.D.state_dict(), "../checkpoint/WGAN_MNIST/D_{}.pth".format(epoch))
         print("model saved!")
 
     def load(self):
-        self.G.load_state_dict(torch.load("../checkpoint/WGAN/G.pth"))
-        self.D.load_state_dict(torch.load("../checkpoint/WGAN/D.pth"))
+        self.G.load_state_dict(torch.load("../checkpoint/WGAN_MNIST/G.pth"))
+        self.D.load_state_dict(torch.load("../checkpoint/WGAN_MNIST/D.pth"))
         print("model loaded!")
 
     def evaluate(self, epoch = 0):
@@ -135,12 +135,12 @@ class WGAN():
             fake_img = self.G(z)
             fake_img = fake_img.data.cpu()
             grid = utils.make_grid(fake_img)
-            utils.save_image(grid, '../Results/WGAN_CIFAR/img_generatori_iter_{}.png'.format(epoch))
+            utils.save_image(grid, '../Results/WGAN_MNIST/img_generatori_iter_{}.png'.format(epoch))
 
 if __name__ == '__main__':
     WGAN = WGAN()
     try:
-        os.mkdir('../Results/WGAN_CIFAR/')
+        os.mkdir('../Results/WGAN_MNIST/')
     except:
         pass
     WGAN.train(train_loader)

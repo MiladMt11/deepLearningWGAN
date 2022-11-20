@@ -8,15 +8,15 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 from functools import reduce
 import numpy as np
-classes = np.arange(2)
+classes = np.arange(10)
 
 def one_hot(labels):
     y = torch.eye(len(classes))
     return y[labels]
 
 # Define the train and test sets
-dset_train = MNIST("./", train=True, download=True, transform=ToTensor(), target_transform=one_hot)
-dset_test  = MNIST("./", train=False, transform=ToTensor(), target_transform=one_hot)
+dset_train = MNIST("~/文档/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=True, download=True, transform=ToTensor(), target_transform=one_hot)
+dset_test  = MNIST("~/文档/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=False, transform=ToTensor(), target_transform=one_hot)
 
 def stratified_sampler(labels):
     """Sampler that only picks datapoints corresponding to the specified classes"""
@@ -24,7 +24,7 @@ def stratified_sampler(labels):
     indices = torch.from_numpy(indices)
     return SubsetRandomSampler(indices)
 
-batch_size = 64
+batch_size = 4096
 # The loaders perform the actual work
 train_loader = DataLoader(dset_train, batch_size=batch_size,
                           sampler=stratified_sampler(dset_train.train_labels), pin_memory=cuda)

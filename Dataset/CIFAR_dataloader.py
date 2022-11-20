@@ -18,8 +18,8 @@ def one_hot(labels):
     return y[labels]
 
 # Define the train and test sets
-dset_train = CIFAR10("H:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=True, download=True, transform=ToTensor(), target_transform=one_hot)
-dset_test  = CIFAR10("H:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=False, transform=ToTensor(), target_transform=one_hot)
+dset_train = CIFAR10("~/文档/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=True, download=True, transform=ToTensor(), target_transform=one_hot)
+dset_test  = CIFAR10("~/文档/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=False, transform=ToTensor(), target_transform=one_hot)
 
 def stratified_sampler(labels):
     """Sampler that only picks datapoints corresponding to the specified classes"""
