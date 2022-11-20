@@ -1,5 +1,5 @@
 import sys
-sys.path.append('h:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN')
+sys.path.append('/home/karl/文档/Master/02456_Deep_learning/deepLearningWGAN')
 import torch
 import torch.nn as nn
 import os
@@ -18,7 +18,7 @@ class Generator(nn.Module):
             layer = []
             layer.append(nn.ConvTranspose2d(input_nums, output_nums, kernel_size=(4,4), stride=(2,2), padding=(1,1)))
             layer.append(nn.BatchNorm2d(output_nums))
-            layer.append(nn.ReLU())
+            layer.append(nn.ReLU(True))
             return layer
 
         self.Net = nn.Sequential(
@@ -41,7 +41,7 @@ class Discriminator(nn.Module):
             layer = []
             layer.append(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)))
             layer.append(nn.BatchNorm2d(output_nums))
-            layer.append(nn.LeakyReLU(0.2))
+            layer.append(nn.LeakyReLU(0.2, inplace=True))
             return layer
 
         self.Net = nn.Sequential(
@@ -85,14 +85,12 @@ class WGAN():
                         p.data.clamp_(-self.weight_cliping_limit, self.weight_cliping_limit)
                     D_real = self.D(x)
                     loss_real = -D_real.mean(0).view(1)
-                    optim_D.zero_grad()
                     loss_real.backward()
                     optim_D.step()
                     z = torch.randn((batch_size, 100, 1, 1)).to(device)
                     x_fake = self.G(z)
                     loss_fake = self.D(x_fake.detach())
                     loss_fake = loss_fake.mean(0).view(1)
-                    optim_D.zero_grad()
                     loss_fake.backward()
                     optim_D.step()
                     loss_D = loss_fake + loss_real
@@ -105,7 +103,6 @@ class WGAN():
                 loss_G = self.D(x_fake)
                 loss_G = -loss_G.mean(0).view(1)
                 # train the generator
-                optim_G.zero_grad()
                 loss_G.backward()
                 optim_G.step()
             print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
