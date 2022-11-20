@@ -116,7 +116,6 @@ class DCGAN():
                 loss_D = loss_fake + loss_real
                 wandb.log({"loss_D": loss_D})
                 # train the discreiminator
-                optim_D.zero_grad()
                 loss_D.backward()
                 optim_D.step()
                 x_fake = self.G(z)
@@ -124,7 +123,6 @@ class DCGAN():
                 loss_G = self.loss_func(loss_G, true_label)
                 wandb.log({"loss_G": loss_G})
                 # train the generator
-                optim_G.zero_grad()
                 loss_G.backward()
                 optim_G.step()
             print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
