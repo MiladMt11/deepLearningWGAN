@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/home/karl/文档/Master/02456_Deep_learning/deepLearningWGAN')
+sys.path.append('H:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN')
 import torch
 import torch.nn as nn
 import numpy as np
@@ -88,20 +88,24 @@ class DCGAN():
         self.loss_func = nn.BCELoss()
 
     def train(self, train_loader):
+        G_losses = []
+        Real_losses = []
+        Fake_losses = []
         try:
-            os.mkdir('../checkpoint/DCGAN/')
+            os.mkdir('../checkpoint/DCGAN_CIFAR/')
         except:
             pass
-        optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4)
-        optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4)
+        optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4, betas=(0.5, 0.999))
+        optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4, betas=(0.5, 0.999))
         try:
             self.load()
         except:
             self.D.apply(weights_init)
             print('parameters initialization')
+        train_loader = train_loader.to(device)
         for epoch in range(self.epochs):
             for x, _ in train_loader:
-                x = x.to(device)
+                # x = x.to(device)
                 batch_size = x.size(0)
                 true_label = torch.ones(batch_size, 1).to(device)
                 fake_label = torch.zeros(batch_size, 1).to(device)
@@ -109,15 +113,19 @@ class DCGAN():
                 self.G.zero_grad()
                 D_real = self.D(x)
                 loss_real = self.loss_func(D_real, true_label)
+                loss_real.backward()
                 z = torch.randn((batch_size, 100, 1, 1)).to(device)
                 x_fake = self.G(z)
                 D_fake = self.D(x_fake.detach())
                 loss_fake = self.loss_func(D_fake, fake_label)
-                loss_D = loss_fake + loss_real
+                loss_fake.backward()
+                # loss_D = loss_fake + loss_real
                 # wandb.log({"loss_D": loss_D})
                 # train the discreiminator
-                loss_D.backward()
+                # loss_D.backward()
                 optim_D.step()
+                Real_losses.append(loss_real.item())
+                Fake_losses.append(loss_fake.item())
                 x_fake = self.G(z)
                 loss_G = self.D(x_fake)
                 loss_G = self.loss_func(loss_G, true_label)
@@ -125,6 +133,7 @@ class DCGAN():
                 # train the generator
                 loss_G.backward()
                 optim_G.step()
+                G_losses.append(loss_G.item())
             print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
             print("D_real_loss:{}, D_fake_loss:{}".format(loss_real.cpu().detach().numpy(),
                                                                    loss_fake.cpu().detach().numpy()))
@@ -133,13 +142,13 @@ class DCGAN():
                 self.evaluate(epoch = epoch)
 
     def save(self):
-        torch.save(self.G.state_dict(), "../checkpoint/DCGAN/G.pth")
-        torch.save(self.D.state_dict(), "../checkpoint/DCGAN/D.pth")
+        torch.save(self.G.state_dict(), "../checkpoint/DCGAN_CIFAR/G.pth")
+        torch.save(self.D.state_dict(), "../checkpoint/DCGAN_CIFAR/D.pth")
         print("model saved!")
 
     def load(self):
-        self.G.load_state_dict(torch.load("../checkpoint/DCGAN/G.pth"))
-        self.D.load_state_dict(torch.load("../checkpoint/DCGAN/D.pth"))
+        self.G.load_state_dict(torch.load("../checkpoint/DCGAN_CIFAR/G.pth"))
+        self.D.load_state_dict(torch.load("../checkpoint/DCGAN_CIFAR/D.pth"))
         print("model loaded!")
 
     def evaluate(self, epoch = 0):

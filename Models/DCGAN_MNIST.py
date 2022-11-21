@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/home/karl/文档/Master/02456_Deep_learning/deepLearningWGAN')
+sys.path.append('H:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN')
 import torch
 import torch.nn as nn
 import numpy as np
@@ -13,8 +13,6 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 class Flatten(nn.Module):
     def forward(self, x):
         return x.view(x.size(0), -1)
-
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # custom weights initialization called on netG and netD
 def weights_init(m):
@@ -84,12 +82,15 @@ class DCGAN():
         self.loss_func = nn.BCELoss()
 
     def train(self, train_loader):
+        G_losses = []
+        Real_losses = []
+        Fake_losses = []
         try:
             os.mkdir('../checkpoint/DCGAN_MNIST/')
         except:
             pass
-        optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4)
-        optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4)
+        optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4, betas=(0.5, 0.999))
+        optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4, betas=(0.5, 0.999))
         try:
             self.load()
         except:
@@ -105,15 +106,19 @@ class DCGAN():
                 self.G.zero_grad()
                 D_real = self.D(x)
                 loss_real = self.loss_func(D_real, true_label)
+                loss_real.backward()
                 z = torch.randn((batch_size, 100, 1, 1)).to(device)
                 x_fake = self.G(z)
                 D_fake = self.D(x_fake.detach())
                 loss_fake = self.loss_func(D_fake, fake_label)
-                loss_D = loss_fake + loss_real
+                loss_fake.backward()
+                # loss_D = loss_fake + loss_real
                 # wandb.log({"loss_D": loss_D})
                 # train the discreiminator
-                loss_D.backward()
+                # loss_D.backward()
                 optim_D.step()
+                Real_losses.append(loss_real.item())
+                Fake_losses.append(loss_fake.item())
                 x_fake = self.G(z)
                 loss_G = self.D(x_fake)
                 loss_G = self.loss_func(loss_G, true_label)
@@ -121,6 +126,7 @@ class DCGAN():
                 # train the generator
                 loss_G.backward()
                 optim_G.step()
+                G_losses.append(loss_G.item())
             print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
             print("D_real_loss:{}, D_fake_loss:{}".format(loss_real.cpu().detach().numpy(),
                                                                    loss_fake.cpu().detach().numpy()))

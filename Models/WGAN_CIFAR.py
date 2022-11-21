@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/home/karl/文档/Master/02456_Deep_learning/deepLearningWGAN')
+sys.path.append('H:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN')
 import torch
 import torch.nn as nn
 import os
@@ -41,7 +41,7 @@ class Discriminator(nn.Module):
             layer = []
             layer.append(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)))
             layer.append(nn.BatchNorm2d(output_nums))
-            layer.append(nn.LeakyReLU(0.2, inplace=True))
+            layer.append(nn.ReLU(True))
             return layer
 
         self.Net = nn.Sequential(
@@ -50,7 +50,6 @@ class Discriminator(nn.Module):
             *Conv(64, 128),
         )
         self.conv = nn.Conv2d(128, 1, kernel_size=(4, 4), stride=(1,1), padding=0)
-        self.Flatten = nn.Flatten()
 
     def forward(self, input):
         output = self.Net(input)
@@ -66,6 +65,13 @@ class WGAN():
         self.D_iter = 5
 
     def train(self, train_loader):
+        G_losses = []
+        Real_losses = []
+        Fake_losses = []
+        try:
+            os.mkdir('../checkpoint/WGAN_CIFAR/')
+        except:
+            pass
         optim_G = torch.optim.RMSprop(self.G.parameters(), lr=5e-5)
         optim_D = torch.optim.RMSprop(self.D.parameters(), lr=5e-5)
         try:
@@ -86,7 +92,6 @@ class WGAN():
                     D_real = self.D(x)
                     loss_real = -D_real.mean(0).view(1)
                     loss_real.backward()
-                    optim_D.step()
                     z = torch.randn((batch_size, 100, 1, 1)).to(device)
                     x_fake = self.G(z)
                     loss_fake = self.D(x_fake.detach())
@@ -94,6 +99,8 @@ class WGAN():
                     loss_fake.backward()
                     optim_D.step()
                     loss_D = loss_fake + loss_real
+                    Real_losses.append(loss_real.item())
+                    Fake_losses.append(loss_fake.item())
 
                 z = torch.randn((batch_size, 100, 1, 1)).to(device)
                 self.G.zero_grad()
@@ -105,6 +112,7 @@ class WGAN():
                 # train the generator
                 loss_G.backward()
                 optim_G.step()
+                G_losses.append(loss_G.item())
             print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
             print("D_real_loss:{}, D_fake_loss:{}".format(loss_real.cpu().detach().numpy(),
                                                                    loss_fake.cpu().detach().numpy()))
