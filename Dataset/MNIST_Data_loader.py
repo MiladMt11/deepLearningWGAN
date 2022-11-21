@@ -8,6 +8,7 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 from functools import reduce
 import numpy as np
+import torchvision 
 classes = np.arange(10)
 
 def one_hot(labels):
@@ -15,8 +16,18 @@ def one_hot(labels):
     return y[labels]
 
 # Define the train and test sets
-dset_train = MNIST("~/文档/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=True, download=True, transform=ToTensor(), target_transform=one_hot)
-dset_test  = MNIST("~/文档/Master/02456_Deep_learning/deepLearningWGAN/Dataset/", train=False, transform=ToTensor(), target_transform=one_hot)
+dset_train = MNIST("/zhome/5f/d/136189/deepLearningWGAN/Dataset/", train=True, download=True, target_transform=one_hot, 
+				transform=torchvision.transforms.Compose([
+                               torchvision.transforms.ToTensor(),
+                               torchvision.transforms.Normalize(
+                                 (0.1307,), (0.3081,))
+                             ]))
+dset_test  = MNIST("/zhome/5f/d/136189/deepLearningWGAN/Dataset/", train=False, target_transform=one_hot,
+		transform=torchvision.transforms.Compose([
+                               torchvision.transforms.ToTensor(),
+                               torchvision.transforms.Normalize(
+                                 (0.1307,), (0.3081,))
+                             ]))
 
 def stratified_sampler(labels):
     """Sampler that only picks datapoints corresponding to the specified classes"""
