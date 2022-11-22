@@ -22,11 +22,11 @@ class Generator(nn.Module):
             return layer
 
         self.Net = nn.Sequential(
-            *Conv(num_input, 256),
-            *Conv(256, 128),
-            *Conv(128, 64),
-            *Conv(64, 32),
-            nn.ConvTranspose2d(32, num_output, kernel_size=(4,4), stride=(2,2), padding=(1,1)),
+            *Conv(num_input, 1024),
+            *Conv(1024, 512),
+            *Conv(512, 256),
+            *Conv(256, 64),
+            nn.ConvTranspose2d(64, num_output, kernel_size=(4,4), stride=(2,2), padding=(1,1)),
             nn.Tanh()
         )
 
@@ -45,11 +45,11 @@ class Discriminator(nn.Module):
             return layer
 
         self.Net = nn.Sequential(
-            *Conv(input_nums, 32),
-            *Conv(32, 64),
-            *Conv(64, 128),
+            *Conv(input_nums, 64),
+            *Conv(64, 256),
+            *Conv(256, 512),
         )
-        self.conv = nn.Conv2d(128, 1, kernel_size=(4, 4), stride=(1,1), padding=0)
+        self.conv = nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1,1), padding=0)
 
     def forward(self, input):
         output = self.Net(input)
