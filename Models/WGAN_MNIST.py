@@ -66,7 +66,7 @@ class WGAN():
         self.epoch = 0
         self.maxepochs = int(1e3)
         self.optim_G = torch.optim.RMSprop(self.G.parameters(), lr=5e-5)
-        self.optim_D = torch.optim.RMSprop(self.G.parameters(), lr=5e-5)
+        self.optim_D = torch.optim.RMSprop(self.D.parameters(), lr=5e-5)
         self.G_losses = []
         self.Real_losses = []
         self.Fake_losses = []
