@@ -54,7 +54,6 @@ class Discriminator(nn.Module):
             nn.ReLU(True),
             nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1, 1), padding=(0, 0)),
         )
-        self.Flatten = nn.Flatten()
 
     def forward(self, input):
         output = self.Net(input)
@@ -83,6 +82,8 @@ class WGAN():
             self.load()
         except:
             pass
+        self.G.train()
+        self.D.train()
         while self.epoch < self.maxepochs + 1:
             for x, _ in train_loader:
                 x = x.to(device)
@@ -136,14 +137,14 @@ class WGAN():
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
                     "losses_real": self.Real_losses}, "../checkpoint/WGAN_MNIST/D.pth")
-        torch.save({"epoch": self.epoch,
-                    "G_state_dict": self.G.state_dict(),
-                    "optimizer_G": self.optim_G.state_dict(),
-                    "losses_G": self.G_losses}, "../checkpoint/WGAN_MNIST/G_{}.pth".format(self.epoch))
-        torch.save({"D_state_dict": self.D.state_dict(),
-                    "optimizer_D": self.optim_D.state_dict(),
-                    "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/WGAN_MNIST/D_{}.pth".format(self.epoch))
+        # torch.save({"epoch": self.epoch,
+        #             "G_state_dict": self.G.state_dict(),
+        #             "optimizer_G": self.optim_G.state_dict(),
+        #             "losses_G": self.G_losses}, "../checkpoint/WGAN_MNIST/G_{}.pth".format(self.epoch))
+        # torch.save({"D_state_dict": self.D.state_dict(),
+        #             "optimizer_D": self.optim_D.state_dict(),
+        #             "losses_fake": self.Fake_losses,
+        #             "losses_real": self.Real_losses}, "../checkpoint/WGAN_MNIST/D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
