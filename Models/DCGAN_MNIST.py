@@ -145,14 +145,14 @@ class DCGAN():
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
                     "losses_real": self.Real_losses}, "../checkpoint/DCGAN_MNIST/D.pth")
-        torch.save({"epoch": self.epoch,
-                    "G_state_dict": self.G.state_dict(),
-                    "optimizer_G": self.optim_G.state_dict(),
-                    "losses_G": self.G_losses}, "../checkpoint/DCGAN_MNIST/G_{}.pth".format(self.epoch))
-        torch.save({"D_state_dict": self.D.state_dict(),
-                    "optimizer_D": self.optim_D.state_dict(),
-                    "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/DCGAN_MNIST/D_{}.pth".format(self.epoch))
+        # torch.save({"epoch": self.epoch,
+        #             "G_state_dict": self.G.state_dict(),
+        #             "optimizer_G": self.optim_G.state_dict(),
+        #             "losses_G": self.G_losses}, "../checkpoint/DCGAN_MNIST/G_{}.pth".format(self.epoch))
+        # torch.save({"D_state_dict": self.D.state_dict(),
+        #             "optimizer_D": self.optim_D.state_dict(),
+        #             "losses_fake": self.Fake_losses,
+        #             "losses_real": self.Real_losses}, "../checkpoint/DCGAN_MNIST/D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
