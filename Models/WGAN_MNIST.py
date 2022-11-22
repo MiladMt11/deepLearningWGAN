@@ -83,7 +83,7 @@ class WGAN():
             self.load()
         except:
             pass
-        while self.epoch < self.maxepochs:
+        while self.epoch < self.maxepochs + 1:
             for x, _ in train_loader:
                 x = x.to(device)
                 batch_size = x.size(0)

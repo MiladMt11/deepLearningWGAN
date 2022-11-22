@@ -97,7 +97,7 @@ class DCGAN():
         except:
             self.D.apply(weights_init)
             print('parameters initialization')
-        while self.epoch < self.maxepochs:
+        while self.epoch < self.maxepochs + 1:
             for x, _ in train_loader:
                 x = x.to(device)
                 batch_size = x.size(0)
