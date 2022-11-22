@@ -84,28 +84,28 @@ class DCGAN():
     def __init__(self):
         self.G = Generator(100, 3).to(device)
         self.D = Discriminator(3).to(device)
-        self.epochs = int(1e3)
+        self.epoch = 0
+        self.maxepochs = int(1e3)
         self.loss_func = nn.BCELoss()
+        self.optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4, betas=(0.5, 0.999))
+        self.optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4, betas=(0.5, 0.999))
+        self.G_losses = []
+        self.Real_losses = []
+        self.Fake_losses = []
 
     def train(self, train_loader):
-        G_losses = []
-        Real_losses = []
-        Fake_losses = []
         try:
             os.mkdir('../checkpoint/DCGAN_CIFAR/')
         except:
             pass
-        optim_G = torch.optim.Adam(self.G.parameters(),lr=1e-4, betas=(0.5, 0.999))
-        optim_D = torch.optim.Adam(self.D.parameters(),lr=1e-4, betas=(0.5, 0.999))
         try:
             self.load()
         except:
             self.D.apply(weights_init)
             print('parameters initialization')
-        train_loader = train_loader.to(device)
-        for epoch in range(self.epochs):
+        while self.epoch < self.maxepochs:
             for x, _ in train_loader:
-                # x = x.to(device)
+                x = x.to(device)
                 batch_size = x.size(0)
                 true_label = torch.ones(batch_size, 1).to(device)
                 fake_label = torch.zeros(batch_size, 1).to(device)
@@ -123,42 +123,65 @@ class DCGAN():
                 # wandb.log({"loss_D": loss_D})
                 # train the discreiminator
                 # loss_D.backward()
-                optim_D.step()
-                Real_losses.append(loss_real.item())
-                Fake_losses.append(loss_fake.item())
+                self.optim_D.step()
+                self.Real_losses.append(loss_real.item())
+                self.Fake_losses.append(loss_fake.item())
                 x_fake = self.G(z)
                 loss_G = self.D(x_fake)
                 loss_G = self.loss_func(loss_G, true_label)
                 # wandb.log({"loss_G": loss_G})
                 # train the generator
                 loss_G.backward()
-                optim_G.step()
-                G_losses.append(loss_G.item())
-            print("epoch:{}, G_loss:{}".format(epoch, loss_G.cpu().detach().numpy()))
+                self.optim_G.step()
+                self.G_losses.append(loss_G.item())
+            print("epoch:{}, G_loss:{}".format(self.epoch, loss_G.cpu().detach().numpy()))
             print("D_real_loss:{}, D_fake_loss:{}".format(loss_real.cpu().detach().numpy(),
                                                                    loss_fake.cpu().detach().numpy()))
-            if epoch % 20 == 0:
+            if self.epoch % 20 == 0:
                 self.save()
-                self.evaluate(epoch = epoch)
+                self.evaluate()
+            self.epoch += 1
 
     def save(self):
-        torch.save(self.G.state_dict(), "../checkpoint/DCGAN_CIFAR/G.pth")
-        torch.save(self.D.state_dict(), "../checkpoint/DCGAN_CIFAR/D.pth")
+        torch.save({"epoch": self.epoch,
+                    "G_state_dict": self.G.state_dict(),
+                    "optimizer_G": self.optim_G.state_dict(),
+                    "losses_G": self.G_losses}, "../checkpoint/DCGAN_MNIST/G.pth")
+        torch.save({"D_state_dict": self.D.state_dict(),
+                    "optimizer_D": self.optim_D.state_dict(),
+                    "losses_fake": self.Fake_losses,
+                    "losses_real": self.Real_losses}, "../checkpoint/DCGAN_MNIST/D.pth")
+        torch.save({"epoch": self.epoch,
+                    "G_state_dict": self.G.state_dict(),
+                    "optimizer_G": self.optim_G.state_dict(),
+                    "losses_G": self.G_losses}, "../checkpoint/DCGAN_MNIST/G_{}.pth".format(self.epoch))
+        torch.save({"D_state_dict": self.D.state_dict(),
+                    "optimizer_D": self.optim_D.state_dict(),
+                    "losses_fake": self.Fake_losses,
+                    "losses_real": self.Real_losses}, "../checkpoint/DCGAN_MNIST/D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
-        self.G.load_state_dict(torch.load("../checkpoint/DCGAN_CIFAR/G.pth"))
-        self.D.load_state_dict(torch.load("../checkpoint/DCGAN_CIFAR/D.pth"))
+        checkpoint_G = torch.load("../checkpoint/DCGAN_MNIST/G.pth")
+        checkpoint_D = torch.load("../checkpoint/DCGAN_MNIST/D.pth")
+        self.epoch = checkpoint_G["epoch"]
+        self.G.load_state_dict(checkpoint_G["G_state_dict"])
+        self.optim_G.load_state_dict(checkpoint_G["optimizer_G"])
+        self.G_losses = checkpoint_G["losses_G"]
+        self.D.load_state_dict(checkpoint_D["D_state_dict"])
+        self.optim_D.load_state_dict(checkpoint_D["optimizer_D"])
+        self.Fake_losses = checkpoint_D["losses_fake"]
+        self.Real_losses = checkpoint_D["losses_real"]
         print("model loaded!")
 
-    def evaluate(self, epoch = 0):
+    def evaluate(self):
         self.load()
         z = torch.randn((1, 100, 1, 1)).to(device)
         with torch.no_grad():
             fake_img = self.G(z)
             fake_img = fake_img.data.cpu()
             grid = utils.make_grid(fake_img)
-            utils.save_image(grid, '../Results/DCGAN_CIFAR/img_generatori_iter_{}.png'.format(epoch))
+            utils.save_image(grid, '../Results/DCGAN_CIFAR/img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
     DCGAN = DCGAN()
