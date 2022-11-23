@@ -158,7 +158,8 @@ class Generator(nn.Module):
             layer.append(bn)
             layer.append(nn.ReLU(True))
             return layer
-
+        self.conv = nn.ConvTranspose2d(64, num_output, kernel_size=(4,4), stride=(2,2), padding=(1,1))
+        nn.init.xavier_uniform_(self.conv.weight.data, 1.)
         self.Net = nn.Sequential(
             *Conv(num_input, 1024),
             ResNet(1024, 1024),
@@ -168,7 +169,7 @@ class Generator(nn.Module):
             ResNet(256, 256),
             *Conv(256, 64),
             ResNet(64, 64),
-            nn.ConvTranspose2d(64, num_output, kernel_size=(4,4), stride=(2,2), padding=(1,1)),
+            self.conv,
             nn.Tanh()
         )
 

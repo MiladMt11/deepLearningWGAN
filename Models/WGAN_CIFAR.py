@@ -45,16 +45,16 @@ class ResNet(nn.Module):
             nn.ReLU()
         )
         self.Conv_x = nn.Sequential(
-            nn.Conv2d(in_channel, 1024, kernel_size=(3, 3), stride=(1, 1), padding=1),
-            nn.BatchNorm2d(1024),
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=1),
+            nn.BatchNorm2d(out_channel),
             nn.ReLU()
         )
-        self.blk1 = Res_Block(out_channel, 128)
-        self.blk2 = Res_Block(128, 256)
-        self.blk3 = Res_Block(256, 512)
-        self.blk4 = Res_Block(512, 1024)
+        self.blk1 = Res_Block(out_channel, out_channel)
+        self.blk2 = Res_Block(out_channel, out_channel)
+        self.blk3 = Res_Block(out_channel, out_channel)
+        self.blk4 = Res_Block(out_channel, out_channel)
         self.out = nn.Sequential(
-            nn.Conv2d(1024, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=1),
+            nn.Conv2d(out_channel, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=1),
             nn.BatchNorm2d(out_channel),
             nn.ReLU()
         )
@@ -64,6 +64,8 @@ class ResNet(nn.Module):
         out = self.Conv(x)
         x = self.Conv_x(x)
         out = self.blk4(self.blk3(self.blk2(self.blk1(out))))
+        # out = self.blk3(self.blk2(self.blk1(out)))
+        # out = self.blk2(self.blk1(out))
         out = self.Relu(x + out)
         out = self.out(out)
         return out
@@ -107,8 +109,11 @@ class Discriminator(nn.Module):
 
         self.Net = nn.Sequential(
             *Conv(input_nums, 64),
+            ResNet(64,64),
             *Conv(64, 256),
+            ResNet(256, 256),
             *Conv(256, 512),
+            ResNet(512, 512),
         )
         self.conv = nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1,1), padding=0)
 
