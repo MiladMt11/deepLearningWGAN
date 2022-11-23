@@ -33,6 +33,63 @@ def weights_init(m):
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
 
+class Res_Block(nn.Module):
+    def __init__(self, in_channel, out_channel):
+        super(Res_Block, self).__init__()
+        self.Conv = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3,3), stride=(1,1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU(),
+            nn.Conv2d(out_channel, out_channel, kernel_size=(3,3), stride=(1,1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.extra = nn.Sequential()
+        if in_channel != out_channel:
+            self.extra = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, kernel_size=(1,1), stride=(1,1)),
+                nn.BatchNorm2d(out_channel)
+            )
+        self.Relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.Conv(x)
+        x = self.extra(x)
+        out = self.Relu(out + x)
+        return out
+
+class ResNet(nn.Module):
+    def __init__(self, in_channel, out_channel):
+        super(ResNet, self).__init__()
+        self.Conv = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3, 3), stride=(1,1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.Conv_x = nn.Sequential(
+            nn.Conv2d(in_channel, 1024, kernel_size=(3, 3), stride=(1, 1), padding=1),
+            nn.BatchNorm2d(1024),
+            nn.ReLU()
+        )
+        self.blk1 = Res_Block(out_channel, 128)
+        self.blk2 = Res_Block(128, 256)
+        self.blk3 = Res_Block(256, 512)
+        self.blk4 = Res_Block(512, 1024)
+        self.out = nn.Sequential(
+            nn.Conv2d(1024, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.Relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.Conv(x)
+        x = self.Conv_x(x)
+        out = self.blk4(self.blk3(self.blk2(self.blk1(out))))
+        out = self.Relu(x + out)
+        out = self.out(out)
+        return out
+
 class Generator(nn.Module):
     def __init__(self, num_input, num_output):
         super(Generator, self).__init__()
@@ -45,9 +102,13 @@ class Generator(nn.Module):
 
         self.Net = nn.Sequential(
             *Conv(num_input, 1024),
+            ResNet(1024, 1024),
             *Conv(1024, 512),
+            ResNet(512, 512),
             *Conv(512, 256),
+            ResNet(256, 256),
             *Conv(256, 64),
+            ResNet(64, 64),
             nn.ConvTranspose2d(64, num_output, kernel_size=(4,4), stride=(2,2), padding=(1,1)),
             nn.Tanh()
         )
