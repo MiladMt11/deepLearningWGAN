@@ -71,7 +71,7 @@ class WGAN():
 
     def train(self, train_loader):
         try:
-            os.mkdir('../checkpoint/SW_WGAN_MNIST/')
+            os.mkdir('../checkpoint/SN_WGAN_MNIST/')
         except:
             pass
         try:
@@ -128,11 +128,11 @@ class WGAN():
         torch.save({"epoch": self.epoch,
                     "G_state_dict": self.G.state_dict(),
                     "optimizer_G": self.optim_G.state_dict(),
-                    "losses_G": self.G_losses}, "../checkpoint/SW_WGAN_MNIST/G.pth")
+                    "losses_G": self.G_losses}, "../checkpoint/SN_WGAN_MNIST/G.pth")
         torch.save({"D_state_dict": self.D.state_dict(),
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/SW_WGAN_MNIST/D.pth")
+                    "losses_real": self.Real_losses}, "../checkpoint/SN_WGAN_MNIST/D.pth")
         # torch.save({"epoch": self.epoch,
         #             "G_state_dict": self.G.state_dict(),
         #             "optimizer_G": self.optim_G.state_dict(),
@@ -144,8 +144,8 @@ class WGAN():
         print("model saved!")
 
     def load(self):
-        checkpoint_G = torch.load("../checkpoint/SW_WGAN_MNIST/G.pth")
-        checkpoint_D = torch.load("../checkpoint/SW_WGAN_MNIST/D.pth")
+        checkpoint_G = torch.load("../checkpoint/SN_WGAN_MNIST/G.pth")
+        checkpoint_D = torch.load("../checkpoint/SN_WGAN_MNIST/D.pth")
         self.epoch = checkpoint_G["epoch"]
         self.G.load_state_dict(checkpoint_G["G_state_dict"])
         self.optim_G.load_state_dict(checkpoint_G["optimizer_G"])
@@ -163,12 +163,12 @@ class WGAN():
             fake_img = self.G(z)
             fake_img = fake_img.data.cpu()
             grid = utils.make_grid(fake_img)
-            utils.save_image(grid, '../Results/SW_WGAN_MNIST/img_generatori_iter_{}.png'.format(self.epoch))
+            utils.save_image(grid, '../Results/SN_WGAN_MNIST/img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
     WGAN = WGAN()
     try:
-        os.mkdir('../Results/SW_WGAN_MNIST/')
+        os.mkdir('../Results/SN_WGAN_MNIST/')
     except:
         pass
     WGAN.train(train_loader)
