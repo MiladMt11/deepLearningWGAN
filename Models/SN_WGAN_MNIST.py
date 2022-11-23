@@ -6,8 +6,6 @@ import os
 # from torch.utils.tensorboard import SummaryWriter
 from Dataset.MNIST_Data_loader import train_loader
 from torchvision import utils
-from spectral_norm import SpectralNorm
-
 # writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -41,14 +39,14 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         def Conv(input_nums, output_nums):
             layer = []
-            layer.append(SpectralNorm(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1))))
+            layer.append(nn.utils.parametrizations.spectral_norm(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1))))
             layer.append(nn.ReLU(True))
             return layer
 
         self.Net = nn.Sequential(
             *Conv(input_nums, 64),
             *Conv(64, 256),
-            SpectralNorm(nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))),
+            nn.utils.parametrizations.spectral_norm(nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))),
             nn.ReLU(True),
             nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1, 1), padding=(0, 0)),
         )

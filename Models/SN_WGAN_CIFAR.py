@@ -6,7 +6,6 @@ import os
 # from torch.utils.tensorboard import SummaryWriter
 from Dataset.CIFAR_dataloader import train_loader
 from torchvision import utils
-from spectral_norm import SpectralNorm
 # writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -91,15 +90,15 @@ class Res_Block_D(nn.Module):
         nn.init.xavier_uniform_(self.conv2.weight.data, 1.)
         nn.init.xavier_uniform_(self.conv3.weight.data, 1.)
         self.Conv = nn.Sequential(
-            SpectralNorm(self.conv1),
+            nn.utils.parametrizations.spectral_norm(self.conv1),
             nn.ReLU(),
-            SpectralNorm(self.conv2),
+            nn.utils.parametrizations.spectral_norm(self.conv2),
             nn.ReLU()
         )
         self.extra = nn.Sequential()
         if in_channel != out_channel:
             self.extra = nn.Sequential(
-                SpectralNorm(self.conv3),
+                nn.utils.parametrizations.spectral_norm(self.conv3),
             )
         self.Relu = nn.ReLU()
 
@@ -119,11 +118,11 @@ class ResNet_D(nn.Module):
         nn.init.xavier_uniform_(self.conv2.weight.data, 1.)
         nn.init.xavier_uniform_(self.conv3.weight.data, 1.)
         self.Conv = nn.Sequential(
-            SpectralNorm(self.conv1),
+            nn.utils.parametrizations.spectral_norm(self.conv1),
             nn.ReLU()
         )
         self.Conv_x = nn.Sequential(
-            SpectralNorm(self.conv2),
+            nn.utils.parametrizations.spectral_norm(self.conv2),
             nn.ReLU()
         )
         self.blk1 = Res_Block_D(out_channel, out_channel)
@@ -131,7 +130,7 @@ class ResNet_D(nn.Module):
         self.blk3 = Res_Block_D(out_channel, out_channel)
         self.blk4 = Res_Block_D(out_channel, out_channel)
         self.out = nn.Sequential(
-            SpectralNorm(self.conv3),
+            nn.utils.parametrizations.spectral_norm(self.conv3),
             nn.ReLU()
         )
         self.Relu = nn.ReLU()
@@ -187,13 +186,13 @@ class Discriminator(nn.Module):
         nn.init.xavier_uniform_(self.conv2.weight.data, 1.)
         nn.init.xavier_uniform_(self.conv3.weight.data, 1.)
         self.Net = nn.Sequential(
-            SpectralNorm(self.conv1),
+            nn.utils.parametrizations.spectral_norm(self.conv1),
             nn.ReLU(True),
             ResNet_D(64,64),
-            SpectralNorm(self.conv2),
+            nn.utils.parametrizations.spectral_norm(self.conv2),
             nn.ReLU(True),
             ResNet_D(256, 256),
-            SpectralNorm(self.conv3),
+            nn.utils.parametrizations.spectral_norm(self.conv3),
             nn.ReLU(True),
             ResNet_D(512, 512)
         )
