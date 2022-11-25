@@ -116,9 +116,6 @@ class WGAN():
                 for i in range(self.D_iter):
                     # train the discreiminator
                     self.D.zero_grad()
-                    # parameters clipping
-                    for p in self.D.parameters():
-                        p.data.clamp_(-self.weight_cliping_limit, self.weight_cliping_limit)
                     D_real = self.D(x)
                     loss_real = -D_real.mean(0).view(1)
                     loss_real.backward()
@@ -128,8 +125,8 @@ class WGAN():
                     loss_fake = loss_fake.mean(0).view(1)
                     loss_fake.backward()
                     # gradient penalty
-                    # gp = self.compute_gp(x, x_fake)
-                    # gp.backward()
+                    gp = self.compute_gp(x, x_fake)
+                    gp.backward()
                     self.optim_D.step()
                     loss_D = loss_fake + loss_real
                     self.Real_losses.append(loss_real.item())

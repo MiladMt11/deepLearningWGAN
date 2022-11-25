@@ -112,8 +112,8 @@ class WGAN():
                 for i in range(self.D_iter):
                     # train the discreiminator
                     self.D.zero_grad()
-                    for p in self.D.parameters():
-                        p.data.clamp_(-self.weight_cliping_limit, self.weight_cliping_limit)
+                    # for p in self.D.parameters():
+                    #     p.data.clamp_(-self.weight_cliping_limit, self.weight_cliping_limit)
                     D_real = self.D(x)
                     loss_real = -D_real.mean(0).view(1)
                     loss_real.backward()
