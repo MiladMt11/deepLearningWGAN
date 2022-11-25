@@ -7,10 +7,29 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 from Dataset.CIFAR_dataloader import train_loader
 from torchvision import utils
-
-writer = SummaryWriter()
+from torchmetrics.image.fid import FrechetInceptionDistance
+# writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+fid = FrechetInceptionDistance().to(device)
+def get_fid(real_images, fake_images):
+    '''
+        Takes real image batch and generated 'fake' image batch
+        Returns FID score, using the pytorch.metrics package
+    '''
+    # add 2 extra channels for MNIST (as required by InceptionV3
+    if real_images.shape[1] != 3:
+        real_images = torch.cat([real_images, real_images, real_images], 1)
+    if fake_images.shape[1] != 3:
+        fake_images = torch.cat([fake_images, fake_images, fake_images], 1)
 
+    # if images not uint8 format, convert them (required format by fid model)
+    if real_images.dtype != torch.uint8 or fake_images.dtype != torch.uint8:
+        real_images = real_images.type(torch.cuda.ByteTensor)
+        fake_images = fake_images.type(torch.cuda.ByteTensor)
+
+    fid.update(real_images, real=True)  # <--- currently running out of memory here
+    fid.update(fake_images, real=False)
+    return fid.compute().item()
 class Res_Block(nn.Module):
     def __init__(self, in_channel, out_channel):
         super(Res_Block, self).__init__()
@@ -135,6 +154,9 @@ class WGAN():
         self.Fake_losses = []
         self.weight_cliping_limit = 0.01
         self.D_iter = 5
+        self.G_best = Generator(100, 3).to(device)
+        self.fid_score = []
+        self.best_fid = 1e10
 
     def train(self, train_loader):
         try:
@@ -189,13 +211,22 @@ class WGAN():
             if self.epoch % 20 == 0:
                 self.save()
                 self.evaluate()
+                fid_score = get_fid(x, x_fake.detach())
+                self.fid_score.append(fid_score)
+                if fid_score < self.best_fid:
+                    self.best_fid = fid_score
+                    self.G_best = self.G
+                print("FID score: {}".format(fid_score))
             self.epoch += 1
 
     def save(self):
         torch.save({"epoch": self.epoch,
                     "G_state_dict": self.G.state_dict(),
+                    "G_best_state_dict": self.G_best.state_dict(),
                     "optimizer_G": self.optim_G.state_dict(),
-                    "losses_G": self.G_losses}, "../checkpoint/WGAN_CIFAR/G.pth")
+                    "losses_G": self.G_losses,
+                    "FID scores": self.fid_score,
+                    "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR/G.pth")
         torch.save({"D_state_dict": self.D.state_dict(),
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
@@ -203,8 +234,11 @@ class WGAN():
         if self.epoch == self.maxepochs:
             torch.save({"epoch": self.epoch,
                         "G_state_dict": self.G.state_dict(),
+                        "G_best_state_dict": self.G_best.state_dict(),
                         "optimizer_G": self.optim_G.state_dict(),
-                        "losses_G": self.G_losses}, "../checkpoint/WGAN_CIFAR/G_{}.pth".format(self.epoch))
+                        "losses_G": self.G_losses,
+                        "FID scores": self.fid_score,
+                        "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR/G_{}.pth")
             torch.save({"D_state_dict": self.D.state_dict(),
                         "optimizer_D": self.optim_D.state_dict(),
                         "losses_fake": self.Fake_losses,
@@ -216,8 +250,11 @@ class WGAN():
         checkpoint_D = torch.load("../checkpoint/WGAN_CIFAR/D.pth")
         self.epoch = checkpoint_G["epoch"]
         self.G.load_state_dict(checkpoint_G["G_state_dict"])
+        self.G_best.load_state_dict(checkpoint_G["G_best_state_dict"])
         self.optim_G.load_state_dict(checkpoint_G["optimizer_G"])
         self.G_losses = checkpoint_G["losses_G"]
+        self.fid_score = checkpoint_G["FID scores"]
+        self.best_fid = checkpoint_G["Best FID score"]
         self.D.load_state_dict(checkpoint_D["D_state_dict"])
         self.optim_D.load_state_dict(checkpoint_D["optimizer_D"])
         self.Fake_losses = checkpoint_D["losses_fake"]
