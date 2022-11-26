@@ -3,7 +3,10 @@ sys.path.append('../')
 import torch
 import torch.nn as nn
 import os
-# from torch.utils.tensorboard import SummaryWriter
+from torch import autograd
+from torch.autograd import Variable
+import numpy as np
+from torch.utils.tensorboard import SummaryWriter
 from Dataset.FASHION_MNIST_Data_loader import train_loader
 from torchvision import utils
 from torchmetrics.image.fid import FrechetInceptionDistance
@@ -59,14 +62,16 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         def Conv(input_nums, output_nums):
             layer = []
-            layer.append(nn.utils.parametrizations.spectral_norm(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1))))
+            layer.append(nn.Conv2d(input_nums, output_nums, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)))
+            layer.append(nn.BatchNorm2d(output_nums))
             layer.append(nn.ReLU(True))
             return layer
 
         self.Net = nn.Sequential(
             *Conv(input_nums, 64),
             *Conv(64, 256),
-            nn.utils.parametrizations.spectral_norm(nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))),
+            nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
+            nn.BatchNorm2d(512),
             nn.ReLU(True),
             nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1, 1), padding=(0, 0)),
         )
@@ -86,15 +91,15 @@ class WGAN():
         self.G_losses = []
         self.Real_losses = []
         self.Fake_losses = []
-        self.weight_cliping_limit = 0.01
         self.D_iter = 5
         self.G_best = Generator(100, 1).to(device)
         self.fid_score = []
         self.best_fid = 1e10
+        self.lambda_term = 10
 
     def train(self, train_loader):
         try:
-            os.mkdir('../checkpoint/SN_WGAN_FashionMNIST/')
+            os.mkdir('../checkpoint/WGAN_FashionMNIST_GP/')
         except:
             pass
         try:
@@ -116,10 +121,13 @@ class WGAN():
                     loss_real = -D_real.mean(0).view(1)
                     loss_real.backward()
                     z = torch.randn((batch_size, 100, 1, 1)).to(device)
-                    x_fake = self.G(z)
-                    loss_fake = self.D(x_fake.detach())
+                    x_fake = self.G(z).detach()
+                    loss_fake = self.D(x_fake)
                     loss_fake = loss_fake.mean(0).view(1)
                     loss_fake.backward()
+                    # gradient penalty
+                    gp = self.calculate_gradient_penalty(x.data, x_fake.data)
+                    gp.backward()
                     self.optim_D.step()
                     loss_D = loss_fake + loss_real
                     self.Real_losses.append(loss_real.item())
@@ -151,6 +159,27 @@ class WGAN():
                 print("FID score: {}".format(fid_score))
             self.epoch += 1
 
+    def calculate_gradient_penalty(self, real_images, fake_images):
+        eta = torch.FloatTensor(real_images.size(0),1,1,1).uniform_(0,1).to(device)
+        eta = eta.expand(real_images.size(0), real_images.size(1), real_images.size(2), real_images.size(3))
+
+        interpolated = eta * real_images + ((1 - eta) * fake_images)
+
+        # define it to calculate gradient
+        interpolated = Variable(interpolated, requires_grad=True)
+
+        # calculate probability of interpolated examples
+        prob_interpolated = self.D(interpolated)
+
+        # calculate gradients of probabilities with respect to examples
+        gradients = autograd.grad(outputs=prob_interpolated, inputs=interpolated,
+                               grad_outputs=torch.ones(
+                                   prob_interpolated.size()).to(device),
+                               create_graph=True, retain_graph=True)[0]
+
+        grad_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * self.lambda_term
+        return grad_penalty
+
     def save(self):
         torch.save({"epoch": self.epoch,
                     "G_state_dict": self.G.state_dict(),
@@ -158,11 +187,11 @@ class WGAN():
                     "optimizer_G": self.optim_G.state_dict(),
                     "losses_G": self.G_losses,
                     "FID scores": self.fid_score,
-                    "Best FID score": self.best_fid}, "../checkpoint/SN_WGAN_FashionMNIST/G.pth")
+                    "Best FID score": self.best_fid}, "../checkpoint/WGAN_FashionMNIST_GP/G.pth")
         torch.save({"D_state_dict": self.D.state_dict(),
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/SN_WGAN_FashionMNIST/D.pth")
+                    "losses_real": self.Real_losses}, "../checkpoint/WGAN_FashionMNIST_GP/D.pth")
         if self.epoch == self.maxepochs:
             torch.save({"epoch": self.epoch,
                         "G_state_dict": self.G.state_dict(),
@@ -170,16 +199,16 @@ class WGAN():
                         "optimizer_G": self.optim_G.state_dict(),
                         "losses_G": self.G_losses,
                         "FID scores": self.fid_score,
-                        "Best FID score": self.best_fid}, "../checkpoint/SN_WGAN_FashionMNIST/G_{}.pth")
+                        "Best FID score": self.best_fid}, "../checkpoint/WGAN_FashionMNIST_GP/G_{}.pth")
             torch.save({"D_state_dict": self.D.state_dict(),
                         "optimizer_D": self.optim_D.state_dict(),
                         "losses_fake": self.Fake_losses,
-                        "losses_real": self.Real_losses}, "../checkpoint/SN_WGAN_FashionMNIST/D_{}.pth".format(self.epoch))
+                        "losses_real": self.Real_losses}, "../checkpoint/WGAN_FashionMNIST_GP/D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
-        checkpoint_G = torch.load("../checkpoint/SN_WGAN_FashionMNIST/G.pth")
-        checkpoint_D = torch.load("../checkpoint/SN_WGAN_FashionMNIST/D.pth")
+        checkpoint_G = torch.load("../checkpoint/WGAN_FashionMNIST_GP/G.pth")
+        checkpoint_D = torch.load("../checkpoint/WGAN_FashionMNIST_GP/D.pth")
         self.epoch = checkpoint_G["epoch"]
         self.G.load_state_dict(checkpoint_G["G_state_dict"])
         self.G_best.load_state_dict(checkpoint_G["G_best_state_dict"])
@@ -200,12 +229,12 @@ class WGAN():
             fake_img = self.G(z)
             fake_img = fake_img.data.cpu()
             grid = utils.make_grid(fake_img)
-            utils.save_image(grid, '../Results/SN_WGAN_FashionMNIST/img_generatori_iter_{}.png'.format(self.epoch))
+            utils.save_image(grid, '../Results/WGAN_FashionMNIST_GP/img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
     WGAN = WGAN()
     try:
-        os.mkdir('../Results/SN_WGAN_FashionMNIST/')
+        os.mkdir('../Results/WGAN_FashionMNIST_GP/')
     except:
         pass
     WGAN.train(train_loader)
