@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 from Dataset.MNIST_Data_loader import train_loader
 from torchvision import utils
 from torchmetrics.image.fid import FrechetInceptionDistance
+from torch.autograd import Variable
 # writer = SummaryWriter()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 fid = FrechetInceptionDistance().to(device)
@@ -90,11 +91,11 @@ class WGAN():
         self.G_losses = []
         self.Real_losses = []
         self.Fake_losses = []
-        self.weight_cliping_limit = 0.01
         self.D_iter = 5
         self.G_best = Generator(100, 1).to(device)
         self.fid_score = []
         self.best_fid = 1e10
+        self.lambda_term = 10
 
     def train(self, train_loader):
         try:
@@ -120,12 +121,12 @@ class WGAN():
                     loss_real = -D_real.mean(0).view(1)
                     loss_real.backward()
                     z = torch.randn((batch_size, 100, 1, 1)).to(device)
-                    x_fake = self.G(z)
-                    loss_fake = self.D(x_fake.detach())
+                    x_fake = self.G(z).detach()
+                    loss_fake = self.D(x_fake)
                     loss_fake = loss_fake.mean(0).view(1)
                     loss_fake.backward()
                     # gradient penalty
-                    gp = self.compute_gp(x, x_fake)
+                    gp = self.calculate_gradient_penalty(x.data, x_fake.data)
                     gp.backward()
                     self.optim_D.step()
                     loss_D = loss_fake + loss_real
@@ -158,32 +159,26 @@ class WGAN():
                 print("FID score: {}".format(fid_score))
             self.epoch += 1
 
-    def compute_gp(self, real_data, fake_data):
-        batch_size = real_data.size(0)
-        # Sample Epsilon from uniform distribution
-        eps = torch.rand(batch_size, 1, 1, 1).to(real_data.device)
-        eps = eps.expand_as(real_data)
+    def calculate_gradient_penalty(self, real_images, fake_images):
+        eta = torch.FloatTensor(real_images.size(0),1,1,1).uniform_(0,1).to(device)
+        eta = eta.expand(real_images.size(0), real_images.size(1), real_images.size(2), real_images.size(3))
 
-        # Interpolation between real data and fake data.
-        interpolation = eps * real_data + (1 - eps) * fake_data
+        interpolated = eta * real_images + ((1 - eta) * fake_images)
 
-        # get logits for interpolated images
-        interp_logits = self.D(interpolation)
-        grad_outputs = torch.ones_like(interp_logits)
+        # define it to calculate gradient
+        interpolated = Variable(interpolated, requires_grad=True)
 
-        # Compute Gradients
-        gradients = autograd.grad(
-            outputs=interp_logits,
-            inputs=interpolation,
-            grad_outputs=grad_outputs,
-            create_graph=True,
-            retain_graph=True,
-        )[0]
+        # calculate probability of interpolated examples
+        prob_interpolated = self.D(interpolated)
 
-        # Compute and return Gradient Norm
-        gradients = gradients.view(batch_size, -1)
-        grad_norm = gradients.norm(2, 1)
-        return torch.mean((grad_norm - 1) ** 2)
+        # calculate gradients of probabilities with respect to examples
+        gradients = autograd.grad(outputs=prob_interpolated, inputs=interpolated,
+                               grad_outputs=torch.ones(
+                                   prob_interpolated.size()).to(device),
+                               create_graph=True, retain_graph=True)[0]
+
+        grad_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * self.lambda_term
+        return grad_penalty
 
     def save(self):
         torch.save({"epoch": self.epoch,

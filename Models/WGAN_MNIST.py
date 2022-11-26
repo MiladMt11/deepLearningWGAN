@@ -123,13 +123,10 @@ class WGAN():
                     loss_real = -D_real.mean(0).view(1)
                     loss_real.backward()
                     z = torch.randn((batch_size, 100, 1, 1)).to(device)
-                    x_fake = self.G(z)
-                    loss_fake = self.D(x_fake.detach())
+                    x_fake = self.G(z).detach()
+                    loss_fake = self.D(x_fake)
                     loss_fake = loss_fake.mean(0).view(1)
                     loss_fake.backward()
-                    # gradient penalty
-                    # gp = self.compute_gp(x, x_fake)
-                    # gp.backward()
                     self.optim_D.step()
                     loss_D = loss_fake + loss_real
                     self.Real_losses.append(loss_real.item())
@@ -160,33 +157,6 @@ class WGAN():
                     self.G_best = self.G
                 print("FID score: {}".format(fid_score))
             self.epoch += 1
-
-    def compute_gp(self, real_data, fake_data):
-        batch_size = real_data.size(0)
-        # Sample Epsilon from uniform distribution
-        eps = torch.rand(batch_size, 1, 1, 1).to(real_data.device)
-        eps = eps.expand_as(real_data)
-
-        # Interpolation between real data and fake data.
-        interpolation = eps * real_data + (1 - eps) * fake_data
-
-        # get logits for interpolated images
-        interp_logits = self.D(interpolation)
-        grad_outputs = torch.ones_like(interp_logits)
-
-        # Compute Gradients
-        gradients = autograd.grad(
-            outputs=interp_logits,
-            inputs=interpolation,
-            grad_outputs=grad_outputs,
-            create_graph=True,
-            retain_graph=True,
-        )[0]
-
-        # Compute and return Gradient Norm
-        gradients = gradients.view(batch_size, -1)
-        grad_norm = gradients.norm(2, 1)
-        return torch.mean((grad_norm - 1) ** 2)
 
     def save(self):
         torch.save({"epoch": self.epoch,
