@@ -7,7 +7,7 @@ from torch import autograd
 from torch.autograd import Variable
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
-from Dataset.MNIST_Data_loader import train_loader
+from Dataset.CIFAR_dataloader import train_loader
 from torchvision import utils
 from torchmetrics.image.fid import FrechetInceptionDistance
 # writer = SummaryWriter()
@@ -32,6 +32,65 @@ def get_fid(real_images, fake_images):
     fid.update(real_images, real=True)  # <--- currently running out of memory here
     fid.update(fake_images, real=False)
     return fid.compute().item()
+class Res_Block(nn.Module):
+    def __init__(self, in_channel, out_channel):
+        super(Res_Block, self).__init__()
+        self.Conv = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3,3), stride=(1,1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU(),
+            nn.Conv2d(out_channel, out_channel, kernel_size=(3,3), stride=(1,1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.extra = nn.Sequential()
+        if in_channel != out_channel:
+            self.extra = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, kernel_size=(1,1), stride=(1,1)),
+                nn.BatchNorm2d(out_channel)
+            )
+        self.Relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.Conv(x)
+        x = self.extra(x)
+        out = self.Relu(out + x)
+        return out
+
+class ResNet(nn.Module):
+    def __init__(self, in_channel, out_channel):
+        super(ResNet, self).__init__()
+        self.Conv = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3, 3), stride=(1,1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.Conv_x = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.blk1 = Res_Block(out_channel, out_channel)
+        self.blk2 = Res_Block(out_channel, out_channel)
+        self.blk3 = Res_Block(out_channel, out_channel)
+        self.blk4 = Res_Block(out_channel, out_channel)
+        self.out = nn.Sequential(
+            nn.Conv2d(out_channel, out_channel, kernel_size=(3, 3), stride=(1, 1), padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU()
+        )
+        self.Relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.Conv(x)
+        x = self.Conv_x(x)
+        out = self.blk4(self.blk3(self.blk2(self.blk1(out))))
+        # out = self.blk3(self.blk2(self.blk1(out)))
+        # out = self.blk2(self.blk1(out))
+        out = self.Relu(x + out)
+        out = self.out(out)
+        return out
+
 class Generator(nn.Module):
     def __init__(self, num_input, num_output):
         super(Generator, self).__init__()
@@ -44,12 +103,14 @@ class Generator(nn.Module):
 
         self.Net = nn.Sequential(
             *Conv(num_input, 1024),
+            ResNet(1024, 1024),
             *Conv(1024, 512),
+            ResNet(512, 512),
             *Conv(512, 256),
-            nn.ConvTranspose2d(256, 64, kernel_size=(4, 4), stride=(2, 2), padding=(2, 2)),
-            nn.BatchNorm2d(64),
-            nn.ReLU(True),
-            nn.ConvTranspose2d(64, num_output, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)),
+            ResNet(256, 256),
+            *Conv(256, 64),
+            ResNet(64, 64),
+            nn.ConvTranspose2d(64, num_output, kernel_size=(4,4), stride=(2,2), padding=(1,1)),
             nn.Tanh()
         )
 
@@ -69,21 +130,23 @@ class Discriminator(nn.Module):
 
         self.Net = nn.Sequential(
             *Conv(input_nums, 64),
+            ResNet(64,64),
             *Conv(64, 256),
-            nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
-            nn.BatchNorm2d(512),
-            nn.ReLU(True),
-            nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1, 1), padding=(0, 0)),
+            ResNet(256, 256),
+            *Conv(256, 512),
+            ResNet(512, 512),
         )
+        self.conv = nn.Conv2d(512, 1, kernel_size=(4, 4), stride=(1,1), padding=0)
 
     def forward(self, input):
         output = self.Net(input)
+        output = self.conv(output)
         return output
 
 class WGAN():
     def __init__(self):
-        self.G = Generator(100, 1).to(device)
-        self.D = Discriminator(1).to(device)
+        self.G = Generator(100, 3).to(device)
+        self.D = Discriminator(3).to(device)
         self.epoch = 0
         self.maxepochs = int(1e3)
         self.optim_G = torch.optim.RMSprop(self.G.parameters(), lr=5e-5)
@@ -92,14 +155,14 @@ class WGAN():
         self.Real_losses = []
         self.Fake_losses = []
         self.D_iter = 5
-        self.G_best = Generator(100, 1).to(device)
+        self.G_best = Generator(100, 3).to(device)
         self.fid_score = []
         self.best_fid = 1e10
         self.lambda_term = 10
 
     def train(self, train_loader):
         try:
-            os.mkdir('../checkpoint/WGAN_MNIST_GP/')
+            os.mkdir('../checkpoint/WGAN_CIFAR/')
         except:
             pass
         try:
@@ -146,7 +209,7 @@ class WGAN():
                 self.G_losses.append(loss_G.item())
             print("epoch:{}, G_loss:{}".format(self.epoch, loss_G.cpu().detach().numpy()))
             print("D_real_loss:{}, D_fake_loss:{}".format(loss_real.cpu().detach().numpy(),
-                                                          loss_fake.cpu().detach().numpy()))
+                                                                   loss_fake.cpu().detach().numpy()))
 
             if self.epoch % 20 == 0:
                 self.save()
@@ -187,11 +250,11 @@ class WGAN():
                     "optimizer_G": self.optim_G.state_dict(),
                     "losses_G": self.G_losses,
                     "FID scores": self.fid_score,
-                    "Best FID score": self.best_fid}, "../checkpoint/WGAN_MNIST_GP/G.pth")
+                    "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR/G.pth")
         torch.save({"D_state_dict": self.D.state_dict(),
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/WGAN_MNIST_GP/D.pth")
+                    "losses_real": self.Real_losses}, "../checkpoint/WGAN_CIFAR/D.pth")
         if self.epoch == self.maxepochs:
             torch.save({"epoch": self.epoch,
                         "G_state_dict": self.G.state_dict(),
@@ -199,16 +262,16 @@ class WGAN():
                         "optimizer_G": self.optim_G.state_dict(),
                         "losses_G": self.G_losses,
                         "FID scores": self.fid_score,
-                        "Best FID score": self.best_fid}, "../checkpoint/WGAN_MNIST_GP/G_{}.pth")
+                        "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR/G_{}.pth")
             torch.save({"D_state_dict": self.D.state_dict(),
                         "optimizer_D": self.optim_D.state_dict(),
                         "losses_fake": self.Fake_losses,
-                        "losses_real": self.Real_losses}, "../checkpoint/WGAN_MNIST_GP/D_{}.pth".format(self.epoch))
+                        "losses_real": self.Real_losses}, "../checkpoint/WGAN_CIFAR/D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
-        checkpoint_G = torch.load("../checkpoint/WGAN_MNIST_GP/G.pth")
-        checkpoint_D = torch.load("../checkpoint/WGAN_MNIST_GP/D.pth")
+        checkpoint_G = torch.load("../checkpoint/WGAN_CIFAR/G.pth")
+        checkpoint_D = torch.load("../checkpoint/WGAN_CIFAR/D.pth")
         self.epoch = checkpoint_G["epoch"]
         self.G.load_state_dict(checkpoint_G["G_state_dict"])
         self.G_best.load_state_dict(checkpoint_G["G_best_state_dict"])
@@ -229,12 +292,12 @@ class WGAN():
             fake_img = self.G(z)
             fake_img = fake_img.data.cpu()
             grid = utils.make_grid(fake_img)
-            utils.save_image(grid, '../Results/WGAN_MNIST_GP/img_generatori_iter_{}.png'.format(self.epoch))
+            utils.save_image(grid, '../Results/WGAN_CIFAR/img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
     WGAN = WGAN()
     try:
-        os.mkdir('../Results/WGAN_MNIST_GP/')
+        os.mkdir('../Results/WGAN_CIFAR/')
     except:
         pass
     WGAN.train(train_loader)
