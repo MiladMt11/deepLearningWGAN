@@ -112,10 +112,11 @@ class DCGAN():
         self.G_best = Generator(100, 1).to(device)
         self.fid_score = []
         self.best_fid = 1e10
+        self.path = 'DCGAN_FashionMNIST/'
 
     def train(self, train_loader):
         try:
-            os.mkdir('../checkpoint/DCGAN_FashionMNIST/')
+            os.mkdir('../checkpoint/'+self.path)
         except:
             pass
         try:
@@ -177,11 +178,11 @@ class DCGAN():
                     "optimizer_G": self.optim_G.state_dict(),
                     "losses_G": self.G_losses,
                     "FID scores": self.fid_score,
-                    "Best FID score": self.best_fid}, "../checkpoint/DCGAN_FashionMNIST/G.pth")
+                    "Best FID score": self.best_fid}, "../checkpoint/"+self.path+"G.pth")
         torch.save({"D_state_dict": self.D.state_dict(),
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/DCGAN_FashionMNIST/D.pth")
+                    "losses_real": self.Real_losses}, "../checkpoint/"+self.path+"D.pth")
         if self.epoch == self.maxepochs:
             torch.save({"epoch": self.epoch,
                         "G_state_dict": self.G.state_dict(),
@@ -189,16 +190,16 @@ class DCGAN():
                         "optimizer_G": self.optim_G.state_dict(),
                         "losses_G": self.G_losses,
                         "FID scores": self.fid_score,
-                        "Best FID score": self.best_fid}, "../checkpoint/DCGAN_FashionMNIST/G_{}.pth")
+                        "Best FID score": self.best_fid}, "../checkpoint/"+self.path+"G_{}.pth")
             torch.save({"D_state_dict": self.D.state_dict(),
                         "optimizer_D": self.optim_D.state_dict(),
                         "losses_fake": self.Fake_losses,
-                        "losses_real": self.Real_losses}, "../checkpoint/DCGAN_FashionMNIST/D_{}.pth".format(self.epoch))
+                        "losses_real": self.Real_losses}, "../checkpoint/"+self.path+"D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
-        checkpoint_G = torch.load("../checkpoint/DCGAN_FashionMNIST/G.pth")
-        checkpoint_D = torch.load("../checkpoint/DCGAN_FashionMNIST/D.pth")
+        checkpoint_G = torch.load("../checkpoint/"+self.path+"G.pth")
+        checkpoint_D = torch.load("../checkpoint/"+self.path+"D.pth")
         self.epoch = checkpoint_G["epoch"]
         self.G.load_state_dict(checkpoint_G["G_state_dict"])
         self.G_best.load_state_dict(checkpoint_G["G_best_state_dict"])
@@ -223,8 +224,9 @@ class DCGAN():
 
 if __name__ == '__main__':
     DCGAN = DCGAN()
+    DCGAN.path = 'DCGAN_FashionMNIST/'
     try:
-        os.mkdir('../Results/DCGAN_FashionMNIST/')
+        os.mkdir('../Results/'+DCGAN.path)
     except:
         pass
     DCGAN.train(train_loader)

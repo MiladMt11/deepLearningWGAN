@@ -1,0 +1,172 @@
+2022-11-19 14:23:52,376 INFO    StreamThr :2660 [internal.py:wandb_internal():88] W&B internal server running at pid: 2660, started at: 2022-11-19 14:23:52.375989
+2022-11-19 14:23:52,377 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: status
+2022-11-19 14:23:52,379 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: status
+2022-11-19 14:23:52,380 DEBUG   SenderThread:2660 [sender.py:send():303] send: header
+2022-11-19 14:23:52,380 INFO    WriterThread:2660 [datastore.py:open_for_write():75] open: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\run-1cybfkam.wandb
+2022-11-19 14:23:52,425 DEBUG   SenderThread:2660 [sender.py:send():303] send: run
+2022-11-19 14:23:53,128 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: check_version
+2022-11-19 14:23:53,131 INFO    SenderThread:2660 [dir_watcher.py:__init__():216] watching files in: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files
+2022-11-19 14:23:53,131 INFO    SenderThread:2660 [sender.py:_start_run_threads():928] run started: 1cybfkam with start time 1668864232.374977
+2022-11-19 14:23:53,131 DEBUG   SenderThread:2660 [sender.py:send():303] send: summary
+2022-11-19 14:23:53,132 INFO    SenderThread:2660 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-19 14:23:53,133 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: check_version
+2022-11-19 14:23:53,472 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: run_start
+2022-11-19 14:23:53,509 DEBUG   HandlerThread:2660 [system_info.py:__init__():31] System info init
+2022-11-19 14:23:53,509 DEBUG   HandlerThread:2660 [system_info.py:__init__():46] System info init done
+2022-11-19 14:23:53,509 INFO    HandlerThread:2660 [system_monitor.py:start():150] Starting system monitor
+2022-11-19 14:23:53,509 INFO    SystemMonitor:2660 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2022-11-19 14:23:53,510 INFO    HandlerThread:2660 [system_monitor.py:probe():168] Collecting system info
+2022-11-19 14:23:53,510 INFO    SystemMonitor:2660 [interfaces.py:start():168] Started cpu
+2022-11-19 14:23:53,517 INFO    SystemMonitor:2660 [interfaces.py:start():168] Started disk
+2022-11-19 14:23:53,518 INFO    SystemMonitor:2660 [interfaces.py:start():168] Started gpu
+2022-11-19 14:23:53,527 INFO    SystemMonitor:2660 [interfaces.py:start():168] Started memory
+2022-11-19 14:23:53,541 INFO    SystemMonitor:2660 [interfaces.py:start():168] Started network
+2022-11-19 14:23:53,554 DEBUG   HandlerThread:2660 [system_info.py:probe():195] Probing system
+2022-11-19 14:23:53,555 DEBUG   HandlerThread:2660 [system_info.py:_probe_git():180] Probing git
+2022-11-19 14:23:53,663 DEBUG   HandlerThread:2660 [system_info.py:_probe_git():188] Probing git done
+2022-11-19 14:23:53,663 DEBUG   HandlerThread:2660 [system_info.py:probe():241] Probing system done
+2022-11-19 14:23:53,663 DEBUG   HandlerThread:2660 [system_monitor.py:probe():177] {'os': 'Windows-10-10.0.22000-SP0', 'python': '3.10.6', 'heartbeatAt': '2022-11-19T13:23:53.554006', 'startedAt': '2022-11-19T13:23:52.360919', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': 'H:\\Courses_files\\Master\\02456_Deep_learning\\deepLearningWGAN\\Models\\DCGAN.py', 'codePath': 'Models\\DCGAN.py', 'git': {'remote': 'https://github.com/mihaelanistor5/deepLearningWGAN.git', 'commit': '6f5581d296190380a8a848de5b2370d70cfc13ff'}, 'email': 'liu_ht2010@qq.com', 'root': 'H:/Courses_files/Master/02456_Deep_learning/deepLearningWGAN', 'host': 'LAPTOP-R3AESCT1', 'username': 'karl', 'executable': 'D:\\Users\\karl\\anaconda3\\envs\\pytorch2\\python.exe', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 2304.0, 'min': 0.0, 'max': 2304.0}, 'cpu_freq_per_core': [{'current': 2304.0, 'min': 0.0, 'max': 2304.0}], 'disk': {'total': 999.8222618103027, 'used': 682.8687591552734}, 'gpu': 'NVIDIA GeForce RTX 3060 Laptop GPU', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 3060 Laptop GPU', 'memory_total': 6442450944}], 'memory': {'total': 15.646194458007812}}
+2022-11-19 14:23:53,664 INFO    HandlerThread:2660 [system_monitor.py:probe():178] Finished collecting system info
+2022-11-19 14:23:53,664 INFO    HandlerThread:2660 [system_monitor.py:probe():181] Publishing system info
+2022-11-19 14:23:53,664 DEBUG   HandlerThread:2660 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2022-11-19 14:23:53,669 DEBUG   HandlerThread:2660 [system_info.py:_save_pip():67] Saving pip packages done
+2022-11-19 14:23:53,669 DEBUG   HandlerThread:2660 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2022-11-19 14:23:54,137 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_created():275] file/dir created: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\conda-environment.yaml
+2022-11-19 14:23:54,137 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_created():275] file/dir created: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\requirements.txt
+2022-11-19 14:23:54,138 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_created():275] file/dir created: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\wandb-summary.json
+2022-11-19 14:23:59,166 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\conda-environment.yaml
+2022-11-19 14:23:59,198 DEBUG   HandlerThread:2660 [system_info.py:_save_conda():86] Saving conda packages done
+2022-11-19 14:23:59,199 INFO    HandlerThread:2660 [system_monitor.py:probe():183] Finished publishing system info
+2022-11-19 14:23:59,234 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-19 14:23:59,235 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: stop_status
+2022-11-19 14:23:59,524 DEBUG   SenderThread:2660 [sender.py:send():303] send: telemetry
+2022-11-19 14:23:59,524 DEBUG   SenderThread:2660 [sender.py:send():303] send: files
+2022-11-19 14:23:59,524 INFO    SenderThread:2660 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-11-19 14:24:00,178 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\conda-environment.yaml
+2022-11-19 14:24:00,178 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_created():275] file/dir created: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\wandb-metadata.json
+2022-11-19 14:24:00,580 INFO    Thread-22 :2660 [upload_job.py:push():143] Uploaded file C:\Users\karl\AppData\Local\Temp\tmpfyoawtwxwandb\1039djf7-wandb-metadata.json
+2022-11-19 14:24:01,001 DEBUG   SenderThread:2660 [sender.py:send():303] send: telemetry
+2022-11-19 14:24:01,149 DEBUG   SenderThread:2660 [sender.py:send():303] send: telemetry
+2022-11-19 14:24:03,200 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_created():275] file/dir created: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\output.log
+2022-11-19 14:24:04,274 DEBUG   SenderThread:2660 [sender.py:send():303] send: exit
+2022-11-19 14:24:04,274 INFO    SenderThread:2660 [sender.py:send_exit():442] handling exit code: 1
+2022-11-19 14:24:04,274 INFO    SenderThread:2660 [sender.py:send_exit():444] handling runtime: 10
+2022-11-19 14:24:04,275 INFO    SenderThread:2660 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-19 14:24:04,276 INFO    SenderThread:2660 [sender.py:send_exit():450] send defer
+2022-11-19 14:24:04,276 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:04,277 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 0
+2022-11-19 14:24:04,277 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:04,277 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 0
+2022-11-19 14:24:04,277 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 1
+2022-11-19 14:24:04,277 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:04,277 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 1
+2022-11-19 14:24:04,277 INFO    HandlerThread:2660 [system_monitor.py:finish():160] Stopping system monitor
+2022-11-19 14:24:04,278 DEBUG   SystemMonitor:2660 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2022-11-19 14:24:04,278 DEBUG   SystemMonitor:2660 [system_monitor.py:_start():137] Finished system metrics aggregation loop
+2022-11-19 14:24:04,284 DEBUG   SystemMonitor:2660 [system_monitor.py:_start():141] Publishing last batch of metrics
+2022-11-19 14:24:04,284 INFO    HandlerThread:2660 [interfaces.py:finish():173] Joined cpu
+2022-11-19 14:24:04,285 INFO    HandlerThread:2660 [interfaces.py:finish():173] Joined disk
+2022-11-19 14:24:04,313 INFO    HandlerThread:2660 [interfaces.py:finish():173] Joined gpu
+2022-11-19 14:24:04,313 INFO    HandlerThread:2660 [interfaces.py:finish():173] Joined memory
+2022-11-19 14:24:04,313 INFO    HandlerThread:2660 [interfaces.py:finish():173] Joined network
+2022-11-19 14:24:04,314 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:04,314 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 1
+2022-11-19 14:24:04,314 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 2
+2022-11-19 14:24:04,314 DEBUG   SenderThread:2660 [sender.py:send():303] send: stats
+2022-11-19 14:24:04,314 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:04,314 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 2
+2022-11-19 14:24:04,315 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:04,315 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 2
+2022-11-19 14:24:04,315 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 3
+2022-11-19 14:24:04,315 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:04,315 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 3
+2022-11-19 14:24:04,315 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:04,315 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 3
+2022-11-19 14:24:04,315 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 4
+2022-11-19 14:24:04,316 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:04,316 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 4
+2022-11-19 14:24:04,316 DEBUG   SenderThread:2660 [sender.py:send():303] send: summary
+2022-11-19 14:24:04,316 INFO    SenderThread:2660 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-19 14:24:04,317 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:04,317 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 4
+2022-11-19 14:24:04,317 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 5
+2022-11-19 14:24:04,317 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:04,317 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 5
+2022-11-19 14:24:04,317 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:04,317 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 5
+2022-11-19 14:24:05,039 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 6
+2022-11-19 14:24:05,040 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:05,040 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 6
+2022-11-19 14:24:05,040 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:05,040 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 6
+2022-11-19 14:24:05,222 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\wandb-summary.json
+2022-11-19 14:24:05,223 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\output.log
+2022-11-19 14:24:05,223 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\config.yaml
+2022-11-19 14:24:05,285 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: poll_exit
+2022-11-19 14:24:07,251 INFO    Thread-17 :2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\output.log
+2022-11-19 14:24:08,295 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 7
+2022-11-19 14:24:08,295 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: poll_exit
+2022-11-19 14:24:08,296 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:08,296 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 7
+2022-11-19 14:24:08,296 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:08,296 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 7
+2022-11-19 14:24:08,296 INFO    SenderThread:2660 [dir_watcher.py:finish():362] shutting down directory watcher
+2022-11-19 14:24:09,265 INFO    SenderThread:2660 [dir_watcher.py:_on_file_modified():292] file/dir modified: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\output.log
+2022-11-19 14:24:09,267 INFO    SenderThread:2660 [dir_watcher.py:finish():392] scan: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files
+2022-11-19 14:24:09,267 INFO    SenderThread:2660 [dir_watcher.py:finish():406] scan save: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\conda-environment.yaml conda-environment.yaml
+2022-11-19 14:24:09,267 INFO    SenderThread:2660 [dir_watcher.py:finish():406] scan save: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\config.yaml config.yaml
+2022-11-19 14:24:09,268 INFO    SenderThread:2660 [dir_watcher.py:finish():406] scan save: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\output.log output.log
+2022-11-19 14:24:09,269 INFO    SenderThread:2660 [dir_watcher.py:finish():406] scan save: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\requirements.txt requirements.txt
+2022-11-19 14:24:09,270 INFO    SenderThread:2660 [dir_watcher.py:finish():406] scan save: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\wandb-metadata.json wandb-metadata.json
+2022-11-19 14:24:09,270 INFO    SenderThread:2660 [dir_watcher.py:finish():406] scan save: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\wandb-summary.json wandb-summary.json
+2022-11-19 14:24:09,270 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 8
+2022-11-19 14:24:09,271 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:09,273 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 8
+2022-11-19 14:24:09,273 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:09,273 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 8
+2022-11-19 14:24:09,273 INFO    SenderThread:2660 [file_pusher.py:finish():168] shutting down file pusher
+2022-11-19 14:24:10,282 INFO    Thread-24 :2660 [upload_job.py:push():143] Uploaded file H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\config.yaml
+2022-11-19 14:24:10,286 INFO    Thread-27 :2660 [upload_job.py:push():143] Uploaded file H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\wandb-summary.json
+2022-11-19 14:24:10,292 INFO    Thread-26 :2660 [upload_job.py:push():143] Uploaded file H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\requirements.txt
+2022-11-19 14:24:10,293 INFO    Thread-23 :2660 [upload_job.py:push():143] Uploaded file H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\conda-environment.yaml
+2022-11-19 14:24:10,336 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: keepalive
+2022-11-19 14:24:10,357 INFO    Thread-25 :2660 [upload_job.py:push():143] Uploaded file H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\files\output.log
+2022-11-19 14:24:10,572 INFO    Thread-16 (_thread_body):2660 [sender.py:transition_state():463] send defer: 9
+2022-11-19 14:24:10,573 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:10,573 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 9
+2022-11-19 14:24:10,573 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:10,573 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 9
+2022-11-19 14:24:10,573 INFO    SenderThread:2660 [file_pusher.py:join():173] waiting for file pusher
+2022-11-19 14:24:10,573 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 10
+2022-11-19 14:24:10,573 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:10,575 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 10
+2022-11-19 14:24:10,575 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:10,575 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 10
+2022-11-19 14:24:10,764 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 11
+2022-11-19 14:24:10,764 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:10,765 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 11
+2022-11-19 14:24:10,765 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:10,765 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 11
+2022-11-19 14:24:10,765 INFO    SenderThread:2660 [sender.py:transition_state():463] send defer: 12
+2022-11-19 14:24:10,766 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: defer
+2022-11-19 14:24:10,766 INFO    HandlerThread:2660 [handler.py:handle_request_defer():162] handle defer: 12
+2022-11-19 14:24:10,767 DEBUG   SenderThread:2660 [sender.py:send():303] send: final
+2022-11-19 14:24:10,767 DEBUG   SenderThread:2660 [sender.py:send():303] send: footer
+2022-11-19 14:24:10,767 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: defer
+2022-11-19 14:24:10,767 INFO    SenderThread:2660 [sender.py:send_request_defer():459] handle sender defer: 12
+2022-11-19 14:24:10,769 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: poll_exit
+2022-11-19 14:24:10,769 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: poll_exit
+2022-11-19 14:24:10,770 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: server_info
+2022-11-19 14:24:10,770 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: get_summary
+2022-11-19 14:24:10,771 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: sampled_history
+2022-11-19 14:24:10,771 DEBUG   SenderThread:2660 [sender.py:send_request():317] send_request: server_info
+2022-11-19 14:24:11,332 INFO    MainThread:2660 [wandb_run.py:_footer_history_summary_info():3377] rendering history
+2022-11-19 14:24:11,332 INFO    MainThread:2660 [wandb_run.py:_footer_history_summary_info():3409] rendering summary
+2022-11-19 14:24:11,332 INFO    MainThread:2660 [wandb_run.py:_footer_sync_info():3333] logging synced files
+2022-11-19 14:24:11,334 DEBUG   HandlerThread:2660 [handler.py:handle_request():139] handle_request: shutdown
+2022-11-19 14:24:11,334 INFO    HandlerThread:2660 [handler.py:finish():814] shutting down handler
+2022-11-19 14:24:11,774 INFO    WriterThread:2660 [datastore.py:close():279] close: H:\Courses_files\Master\02456_Deep_learning\deepLearningWGAN\Models\wandb\run-20221119_142352-1cybfkam\run-1cybfkam.wandb
+2022-11-19 14:24:12,335 INFO    SenderThread:2660 [sender.py:finish():1331] shutting down sender
+2022-11-19 14:24:12,335 INFO    SenderThread:2660 [file_pusher.py:finish():168] shutting down file pusher
+2022-11-19 14:24:12,335 INFO    SenderThread:2660 [file_pusher.py:join():173] waiting for file pusher
+2022-11-19 14:24:12,384 INFO    MainThread:2660 [internal.py:handle_exit():78] Internal process exited
