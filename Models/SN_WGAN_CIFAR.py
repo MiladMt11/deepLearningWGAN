@@ -326,7 +326,7 @@ class WGAN():
                         "optimizer_D": self.optim_D.state_dict(),
                         "losses_fake": self.Fake_losses,
                         "losses_real": self.Real_losses}, "../checkpoint/"+self.path+"D_{}.pth".format(self.epoch))
-        print("model saved!")
+        print("model saved! path: "+self.path)
 
     def load(self):
         checkpoint_G = torch.load("../checkpoint/"+self.path+"G.pth")
@@ -342,7 +342,7 @@ class WGAN():
         self.optim_D.load_state_dict(checkpoint_D["optimizer_D"])
         self.Fake_losses = checkpoint_D["losses_fake"]
         self.Real_losses = checkpoint_D["losses_real"]
-        print("model loaded!")
+        print("model loaded! path: "+self.path)
 
     def evaluate(self):
         self.load()

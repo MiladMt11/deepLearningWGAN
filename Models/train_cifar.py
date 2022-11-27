@@ -10,30 +10,27 @@ import os
 if __name__ == '__main__':
     for i in range(3):
         WGAN = WGAN()
-        path = "WGAN_CIFAR_{}/".format(i)
+        WGAN.path = "WGAN_CIFAR_{}/".format(i)
         try:
             os.mkdir('../Results/WGAN_CIFAR')
         except:
             pass
-        WGAN.path = path
         WGAN.train(train_loader)
 
         WGAN_GP = WGAN_GP()
-        path = 'WGAN_CIFAR_GP_{}/'.format(i)
+        WGAN_GP.path = 'WGAN_CIFAR_GP_{}/'.format(i)
         try:
             os.mkdir('../Results/WGAN_CIFAR_GP/')
         except:
             pass
-        WGAN_GP.path = path
         WGAN_GP.train(train_loader)
 
         SN_WGAN = SN_WGAN()
-        path = 'SN_WGAN_CIFAR_{}/'.format(i)
+        SN_WGAN.path = 'SN_WGAN_CIFAR_{}/'.format(i)
         try:
             os.mkdir('../Results/SN_WGAN_CIFAR/')
         except:
             pass
-        SN_WGAN.path = path
         SN_WGAN.train(train_loader)
 
         DCGAN = DCGAN()
