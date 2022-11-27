@@ -162,7 +162,7 @@ class WGAN():
 
     def train(self, train_loader):
         try:
-            os.mkdir('../checkpoint/WGAN_CIFAR/')
+            os.mkdir('../checkpoint/WGAN_CIFAR_GP/')
         except:
             pass
         try:
@@ -250,11 +250,11 @@ class WGAN():
                     "optimizer_G": self.optim_G.state_dict(),
                     "losses_G": self.G_losses,
                     "FID scores": self.fid_score,
-                    "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR/G.pth")
+                    "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR_GP/G.pth")
         torch.save({"D_state_dict": self.D.state_dict(),
                     "optimizer_D": self.optim_D.state_dict(),
                     "losses_fake": self.Fake_losses,
-                    "losses_real": self.Real_losses}, "../checkpoint/WGAN_CIFAR/D.pth")
+                    "losses_real": self.Real_losses}, "../checkpoint/WGAN_CIFAR_GP/D.pth")
         if self.epoch == self.maxepochs:
             torch.save({"epoch": self.epoch,
                         "G_state_dict": self.G.state_dict(),
@@ -262,16 +262,16 @@ class WGAN():
                         "optimizer_G": self.optim_G.state_dict(),
                         "losses_G": self.G_losses,
                         "FID scores": self.fid_score,
-                        "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR/G_{}.pth")
+                        "Best FID score": self.best_fid}, "../checkpoint/WGAN_CIFAR_GP/G_{}.pth")
             torch.save({"D_state_dict": self.D.state_dict(),
                         "optimizer_D": self.optim_D.state_dict(),
                         "losses_fake": self.Fake_losses,
-                        "losses_real": self.Real_losses}, "../checkpoint/WGAN_CIFAR/D_{}.pth".format(self.epoch))
+                        "losses_real": self.Real_losses}, "../checkpoint/WGAN_CIFAR_GP/D_{}.pth".format(self.epoch))
         print("model saved!")
 
     def load(self):
-        checkpoint_G = torch.load("../checkpoint/WGAN_CIFAR/G.pth")
-        checkpoint_D = torch.load("../checkpoint/WGAN_CIFAR/D.pth")
+        checkpoint_G = torch.load("../checkpoint/WGAN_CIFAR_GP/G.pth")
+        checkpoint_D = torch.load("../checkpoint/WGAN_CIFAR_GP/D.pth")
         self.epoch = checkpoint_G["epoch"]
         self.G.load_state_dict(checkpoint_G["G_state_dict"])
         self.G_best.load_state_dict(checkpoint_G["G_best_state_dict"])
@@ -292,12 +292,12 @@ class WGAN():
             fake_img = self.G(z)
             fake_img = fake_img.data.cpu()
             grid = utils.make_grid(fake_img)
-            utils.save_image(grid, '../Results/WGAN_CIFAR/img_generatori_iter_{}.png'.format(self.epoch))
+            utils.save_image(grid, '../Results/WGAN_CIFAR_GP/img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
     WGAN = WGAN()
     try:
-        os.mkdir('../Results/WGAN_CIFAR/')
+        os.mkdir('../Results/WGAN_CIFAR_GP/')
     except:
         pass
     WGAN.train(train_loader)
