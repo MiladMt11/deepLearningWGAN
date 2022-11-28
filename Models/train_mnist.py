@@ -7,27 +7,28 @@ from Dataset.MNIST_Data_loader import train_loader
 import os
 
 if __name__ == '__main__':
+    try:
+        os.mkdir('../Results/WGAN_MNIST/')
+    except:
+        pass
+    try:
+        os.mkdir('../Results/WGAN_MNIST_GP/')
+    except:
+        pass
+    try:
+        os.mkdir('../Results/_SN_WGAN_MNIST/')
+    except:
+        pass
+
     for i in range(3):
         _WGAN = WGAN()
         _WGAN.path = "WGAN_MNIST_{}/".format(i)
-        try:
-            os.mkdir('../Results/WGAN_MNIST/')
-        except:
-            pass
         _WGAN.train(train_loader)
 
         _WGAN_GP = WGAN_GP()
         _WGAN_GP.path = 'WGAN_MNIST_GP_{}/'.format(i)
-        try:
-            os.mkdir('../Results/WGAN_MNIST_GP/')
-        except:
-            pass
         _WGAN_GP.train(train_loader)
 
         _SN_WGAN = SN_WGAN()
         _SN_WGAN.path = '_SN_WGAN_MNIST_{}/'.format(i)
-        try:
-            os.mkdir('../Results/_SN_WGAN_MNIST/')
-        except:
-            pass
         _SN_WGAN.train(train_loader)
