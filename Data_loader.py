@@ -33,7 +33,7 @@ dataset_fashionmnist = FashionMNIST(root="../Dataset/", download=True,
 batch_size = 64
 num_workers = 2
 # The loaders perform the actual work
-train_loader_cifar = torch.utils.data.DataLoader(dataset_cifar, batch_size=16,
+train_loader_cifar = torch.utils.data.DataLoader(dataset_cifar, batch_size=batch_size,
                                          shuffle=True, num_workers= num_workers, pin_memory=True)
 train_loader_mnist = torch.utils.data.DataLoader(dataset_mnist, batch_size=batch_size,
                                          shuffle=True, num_workers= num_workers, pin_memory=True)
