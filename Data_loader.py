@@ -1,41 +1,41 @@
-import numpy as np
+import sys
+sys.path.append('../')
 import torch
 cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if cuda else "cpu")
-
 from torch.utils.data import DataLoader
-from torch.utils.data.sampler import SubsetRandomSampler
-from torchvision.datasets import MNIST
-from torchvision.transforms import ToTensor
-from functools import reduce
-import matplotlib.pyplot as plt
-from IPython.display import Image, display, clear_output
-import numpy as np
-# %matplotlib nbagg
-# %matplotlib inline
-# plt.style.use(["seaborn-deep", "seaborn-whitegrid"])
-# The digit classes to use, these need to be in order because
-# we are using one-hot representation
-classes = np.arange(2)
-
-def one_hot(labels):
-    y = torch.eye(len(classes))
-    return y[labels]
+from torchvision.datasets import CIFAR10, MNIST, FashionMNIST
+import torchvision.transforms as transforms
 
 # Define the train and test sets
-dset_train = MNIST("./", train=True, download=True, transform=ToTensor(), target_transform=one_hot)
-dset_test  = MNIST("./", train=False, transform=ToTensor(), target_transform=one_hot)
-
-def stratified_sampler(labels):
-    """Sampler that only picks datapoints corresponding to the specified classes"""
-    (indices,) = np.where(reduce(lambda x, y: x | y, [labels.numpy() == i for i in classes]))
-    indices = torch.from_numpy(indices)
-    return SubsetRandomSampler(indices)
-
+dataset_cifar = CIFAR10(root="../Dataset/", download=True,
+                           transform=transforms.Compose([
+                               transforms.Resize(32),
+                               transforms.CenterCrop(32),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
+                           ]))
+dataset_mnist = MNIST(root="../Dataset/", download=True,
+                           transform=transforms.Compose([
+                               transforms.Resize(28),
+                               transforms.CenterCrop(28),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.5,), (0.5,)),
+                           ]))
+dataset_fashionmnist = FashionMNIST(root="../Dataset/", download=True,
+                           transform=transforms.Compose([
+                               transforms.Resize(28),
+                               transforms.CenterCrop(28),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.5,), (0.5,)),
+                           ]))
 
 batch_size = 64
+num_workers = 2
 # The loaders perform the actual work
-train_loader = DataLoader(dset_train, batch_size=batch_size,
-                          sampler=stratified_sampler(dset_train.train_labels), pin_memory=cuda)
-test_loader  = DataLoader(dset_test, batch_size=batch_size,
-                          sampler=stratified_sampler(dset_test.test_labels), pin_memory=cuda)
+train_loader_cifar = torch.utils.data.DataLoader(dataset_cifar, batch_size=batch_size,
+                                         shuffle=True, num_workers= num_workers, pin_memory=True)
+train_loader_mnist = torch.utils.data.DataLoader(dataset_mnist, batch_size=batch_size,
+                                         shuffle=True, num_workers= num_workers, pin_memory=True)
+train_loader_fashionmnist = torch.utils.data.DataLoader(dataset_fashionmnist, batch_size=batch_size,
+                                         shuffle=True, num_workers= num_workers, pin_memory=True)

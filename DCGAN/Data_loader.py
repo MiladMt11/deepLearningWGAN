@@ -17,15 +17,15 @@ dataset_cifar = CIFAR10(root="../Dataset/", download=True,
                            ]))
 dataset_mnist = MNIST(root="../Dataset/", download=True,
                            transform=transforms.Compose([
-                               transforms.Resize(32),
-                               transforms.CenterCrop(32),
+                               transforms.Resize(28),
+                               transforms.CenterCrop(28),
                                transforms.ToTensor(),
                                transforms.Normalize((0.5,), (0.5,)),
                            ]))
 dataset_fashionmnist = FashionMNIST(root="../Dataset/", download=True,
                            transform=transforms.Compose([
-                               transforms.Resize(32),
-                               transforms.CenterCrop(32),
+                               transforms.Resize(28),
+                               transforms.CenterCrop(28),
                                transforms.ToTensor(),
                                transforms.Normalize((0.5,), (0.5,)),
                            ]))
