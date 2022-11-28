@@ -9,34 +9,34 @@ import os
 
 if __name__ == '__main__':
     for i in range(3):
-        WGAN = WGAN()
-        WGAN.path = "WGAN_FashionMNIST_{}/".format(i)
+        _WGAN = WGAN()
+        _WGAN.path = "WGAN_FashionMNIST_{}/".format(i)
         try:
             os.mkdir('../Results/WGAN_FashionMNIST/')
         except:
             pass
-        WGAN.train(train_loader)
+        _WGAN.train(train_loader)
 
-        WGAN_GP = WGAN_GP()
-        WGAN_GP.path = 'WGAN_FashionMNIST_GP_{}/'.format(i)
+        _WGAN_GP = WGAN_GP()
+        _WGAN_GP.path = 'WGAN_FashionMNIST_GP_{}/'.format(i)
         try:
             os.mkdir('../Results/WGAN_FashionMNIST_GP/')
         except:
             pass
-        WGAN_GP.train(train_loader)
+        _WGAN_GP.train(train_loader)
 
-        SN_WGAN = SN_WGAN()
-        SN_WGAN.path = 'SN_WGAN_FashionMNIST_{}/'.format(i)
+        _SN_WGAN = SN_WGAN()
+        _SN_WGAN.path = 'SN_WGAN_FashionMNIST_{}/'.format(i)
         try:
             os.mkdir('../Results/SN_WGAN_FashionMNIST/')
         except:
             pass
-        SN_WGAN.train(train_loader)
+        _SN_WGAN.train(train_loader)
 
-        DCGAN = DCGAN()
-        DCGAN.path = 'DCGAN_FashionMNIST_{}/'.format(i)
+        _DCGAN = DCGAN()
+        _DCGAN.path = 'DCGAN_FashionMNIST_{}/'.format(i)
         try:
             os.mkdir('../Results/DCGAN_FashionMNIST/')
         except:
             pass
-        DCGAN.train(train_loader)
+        _DCGAN.train(train_loader)
