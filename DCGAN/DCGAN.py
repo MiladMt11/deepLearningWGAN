@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 from Generator import *
 from Discriminator import *
-from Data_loader import *
+from Data_loader import train_loader_cifar, train_loader_mnist, train_loader_fashionmnist
 from get_fid_score import get_fid
 import os
 from torchvision import utils
@@ -180,7 +180,19 @@ class DCGAN():
             utils.save_image(grid, '../Results/'+path+'img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
-    train_set = "CIFAR"
-    if train_set == "CIFAR":
-        _DCGAN = DCGAN(ResNet = False, train_set = train_set, iter=0)
+    # Train CIFAR on DCGAN 3 times.
+    for i in range(3):
+        _DCGAN = DCGAN(ResNet = False, train_set = "CIFAR", iter=i)
+        _DCGAN.train(train_loader_cifar)
+    # Train MNIST on DCGAN 3 times.
+    for i in range(3):
+        _DCGAN = DCGAN(ResNet=False, train_set="MNIST", iter=i)
+        _DCGAN.train(train_loader_mnist)
+    # Train FashionMNIST on DCGAN 3 times.
+    for i in range(3):
+        _DCGAN = DCGAN(ResNet=False, train_set="FashionMNIST", iter=i)
+        _DCGAN.train(train_loader_fashionmnist)
+    # Train CIFAR on ResNet_DCGAN 1 times.
+    for i in range(1):
+        _DCGAN = DCGAN(ResNet = True, train_set = "CIFAR", iter=i)
         _DCGAN.train(train_loader_cifar)

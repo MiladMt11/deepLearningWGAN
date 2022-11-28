@@ -236,5 +236,42 @@ class WGAN():
             utils.save_image(grid, '../Results/'+path+'img_generatori_iter_{}.png'.format(self.epoch))
 
 if __name__ == '__main__':
-    WGAN = WGAN(ResNet = True, gradient_penalty = False, spectral_norm = True, train_set = 'CIFAR', iter=0)
-    WGAN.train(train_loader_cifar)
+    # Train CIFAR on WGAN 3 times.
+    for i in range(3):
+        _WGAN = WGAN(ResNet = False, gradient_penalty = False, spectral_norm = False, train_set = 'CIFAR', iter=i)
+        _WGAN.train(train_loader_cifar)
+
+    # Train CIFAR on Spectral Normalization WGAN 3 times. Set spectral_norm to true
+    for i in range(3):
+        _WGAN = WGAN(ResNet = False, gradient_penalty = False, spectral_norm = True, train_set = 'CIFAR', iter=i)
+        _WGAN.train(train_loader_cifar)
+
+    # Train MNIST on WGAN 3 times.
+    for i in range(3):
+        _WGAN = WGAN(ResNet = False, gradient_penalty = False, spectral_norm = False, train_set = 'MNIST', iter=i)
+        _WGAN.train(train_loader_mnist)
+
+    # Train MNIST on Spectral Normalization WGAN 3 times. Set spectral_norm to true
+    for i in range(3):
+        _WGAN = WGAN(ResNet = False, gradient_penalty = False, spectral_norm = True, train_set = 'MNIST', iter=i)
+        _WGAN.train(train_loader_mnist)
+
+    # Train FashionMNIST on WGAN 3 times.
+    for i in range(3):
+        _WGAN = WGAN(ResNet = False, gradient_penalty = False, spectral_norm = False, train_set = 'FashionMNIST', iter=i)
+        _WGAN.train(train_loader_fashionmnist)
+
+    # Train FashionMNIST on Spectral Normalization WGAN 3 times. Set spectral_norm to true
+    for i in range(3):
+        _WGAN = WGAN(ResNet = False, gradient_penalty = False, spectral_norm = True, train_set = 'FashionMNIST', iter=i)
+        _WGAN.train(train_loader_fashionmnist)
+
+    # Train CIFAR on ResNet WGAN 3 times. Set ResNet to True
+    for i in range(3):
+        _WGAN = WGAN(ResNet = True, gradient_penalty = False, spectral_norm = False, train_set = 'CIFAR', iter=i)
+        _WGAN.train(train_loader_cifar)
+
+    # Train CIFAR on ResNet Spectral Normalization WGAN 3 times. Set ResNet to True. Set spectral_norm to true
+    for i in range(3):
+        _WGAN = WGAN(ResNet = True, gradient_penalty = False, spectral_norm = True, train_set = 'CIFAR', iter=i)
+        _WGAN.train(train_loader_cifar)
