@@ -13,3 +13,6 @@ the FashionMNIST dataset.
 A more detailed report of the project is provided [here](https://github.com/MiladMt11/deepLearningWGAN/blob/bdd581859a14174388c9326d661c50d26beb05ce/02456___Deep_learning_Project___Report.pdf).
 
 Poster Presentation [here](https://github.com/MiladMt11/deepLearningWGAN/blob/bdd581859a14174388c9326d661c50d26beb05ce/DL_Poster.pdf).
+
+## Framework
+In this project, we used [PyTorch](https://pytorch.org/) for building and training deep learning models, taking advantage of its flexibility and ease of use.
